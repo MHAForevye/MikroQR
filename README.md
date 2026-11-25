@@ -18,6 +18,7 @@ GitHub Pages üzerinde statik olarak çalışabilecek prototip.
 - PNG ve temel SVG export
 - Scan-test risk simülasyonu (gerçek tarama garantisi değildir)
 - Cihaz üzerinde yerel proje kaydı
+- Koyu tema (koyu QR + koyu önizleme), tek tıkla Açık/Koyu QR geçişi
 - Responsive arayüz
 
 ## Notlar / sınırlamalar

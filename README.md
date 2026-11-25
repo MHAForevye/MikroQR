@@ -1,26 +1,21 @@
-# Mikro QR & Kod — Desen ve Modül Stüdyosu
+# QR Görsel Yerleştirici (Gelişmiş)
 
-GitHub Pages üzerinde statik olarak çalışabilecek prototip.
+Kurulum yok, internet gerekmez.
 
-## Çalıştırma
-- `index.html` dosyasını bir web sunucusunda açın veya GitHub Pages ile yayınlayın.
-- QR kod üretimi, `qrcode-generator` kütüphanesini CDN üzerinden yükler; ilk kullanımda internet gerekir.
+1. Bu klasörü zipten çıkar.
+2. `index.html` dosyasını tarayıcıda aç (çift tıkla).
+3. Görsel seç, QR'ın yerini sahnede seç, sürükleyip boyutlandır, "Kaydet"e bas.
 
 ## Özellikler
-- 50+ modül şekli seçimi
-- Payload ile QR üretimi ve ECC seçenekleri
-- Modül ölçüsü, doluluk, gap, yumuşaklık, mikro varyasyon kontrolleri
-- Finder formu ve iç form kontrolleri
-- Renk seçimi ve palet swatch'ları
-- Gradient seçeneği
-- CTA çerçeveleri
-- PNG ve temel SVG export
-- Scan-test risk simülasyonu (gerçek tarama garantisi değildir)
-- Cihaz üzerinde yerel proje kaydı
-- Koyu tema (koyu QR + koyu önizleme), tek tıkla Açık/Koyu QR geçişi
-- Responsive arayüz
+- QR görselin tamamını değil, seçtiğin bölgeyi kaplar; çevresi olduğu gibi kalır
+- Dokunarak yerleştirme, sürükleme, köşeden boyutlandırma, ok tuşlarıyla ince ayar
+- 9 noktalı hızlı konum (köşeler, kenarlar, orta)
+- Nokta stili (kare, yuvarlak köşe, nokta), köşe gözü stili, kutu köşe yuvarlaklığı
+- Renkler, saydam zemin, kenar boşluğu, hata düzeltme seviyesi
+- PNG / JPEG / WebP, orijinal / yarım / 2 kat çözünürlük
+- Taranabilirlik testi (Chrome ve Edge'de yerleşik QR okuyucuyla)
+- Ayarlar tarayıcıda hatırlanır; görsel yükleme sürükle-bırak ve yapıştırma (Ctrl+V) destekler
 
-## Notlar / sınırlamalar
-Bu sürüm, master talimatın tasarım stüdyosu çekirdeğini çalışan prototip olarak uygular. Scan test bölümü gerçek decoder/kamera doğrulaması değil, heuristik uyarıdır. SVG export modül/finder geometrisini temel kareler olarak üretir; ek stil ve çerçeve seçeneklerinin tamamı SVG'ye yansıtılmaz. QR kütüphanesi CDN bağlantısına ihtiyaç duyar.
-
-- Arka plan görseli yükleyip QR'ı görselin içine gömme (örnek arka planlar dahil)
+## Dosyalar
+- `index.html` uygulamanın kendisi
+- `lib/` QR üretim kütüphanesi (qrcode-generator 1.4.4, MIT)

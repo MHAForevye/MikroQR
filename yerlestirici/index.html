@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MikroQR — Görsel Yerleştirici</title>
+<script src="../lib/qrcode.js"></script>
+<script src="../lib/qrcode_UTF8.js"></script>
+<style>
+:root {
+  --bg: #f3f2ef; --surface: #ffffff; --fg: #1b1d21; --muted: #5d636d; --line: #d9d8d3;
+  --accent: #d9480f; --accent-fg: #ffffff; --stage: #e4e3de; --warn: #a15c00; --ok: #2b7a3d;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a; --surface: #1c1f25; --fg: #eceae4; --muted: #9aa0aa; --line: #2d3139;
+    --accent: #ff7a3d; --accent-fg: #14161a; --stage: #0e1013; --warn: #f0b34a; --ok: #6fcf86;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font); padding: 24px max(16px, env(safe-area-inset-right)) 40px max(16px, env(safe-area-inset-left)); }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 20px; }
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; }
+.lead { margin: 4px 0 0; color: var(--muted); max-width: 66ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stage-box { background: var(--stage); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; }
+.stage-wrap { display: grid; place-items: center; min-height: 160px; }
+#stage { display: block; max-width: 100%; height: auto; touch-action: none; cursor: crosshair; border-radius: 4px; }
+#stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.hint { margin: 0; color: var(--muted); font-size: 13px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 14px; }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 12px; min-width: 0; }
+legend { padding: 0; margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2px 0; width: 100%; }
+.field { display: grid; gap: 5px; min-width: 0; }
+label, .lbl { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+input[type="text"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; }
+textarea { resize: vertical; min-height: 64px; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > .field { flex: 1 1 110px; }
+input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.val { font-variant-numeric: tabular-nums; font-weight: 500; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--fg); }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.btn { font: inherit; font-weight: 600; border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btns .btn { flex: 1 1 120px; }
+.pos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 150px; }
+.pos button { aspect-ratio: 1; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; cursor: pointer; position: relative; }
+.pos button::after { content: ""; position: absolute; width: 8px; height: 8px; background: var(--muted); border-radius: 2px; inset: 0; margin: auto; }
+.pos button:hover { border-color: var(--accent); }
+.pos button:hover::after { background: var(--accent); }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.note.warn { color: var(--warn); }
+.note.ok { color: var(--ok); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MikroQR — Görsel Yerleştirici</h1>
+    <p class="lead">Görseli yükle, QR'ın yerleşeceği yeri sahnede seç. Sürükle, köşesinden boyutlandır, stilini ayarla. Görselin geri kalanı değişmez. Her şey tarayıcında çalışır, hiçbir dosya dışarı gönderilmez.</p>
+  </header>
+
+  <div class="grid">
+    <section class="stage-box" aria-label="Görsel sahnesi">
+      <div class="stage-wrap"><canvas id="stage" tabindex="0" aria-label="QR konumunu seç. Ok tuşlarıyla taşıyabilirsin."></canvas></div>
+      <p class="hint" id="hint"></p>
+    </section>
+
+    <aside class="panel" aria-label="Ayarlar">
+      <fieldset>
+        <legend>Görsel</legend>
+        <div class="btns">
+          <button class="btn" id="pick" type="button">Görsel seç</button>
+          <button class="btn" id="sample" type="button">Örnek görsel</button>
+        </div>
+        <input type="file" id="file" accept="image/*" hidden>
+        <p class="note">Dosyayı sahneye sürükleyebilir ya da Ctrl+V ile yapıştırabilirsin.</p>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>İçerik</legend>
+        <div class="field">
+          <label for="data">QR içeriği</label>
+          <textarea id="data" spellcheck="false">https://ornek.com/menu</textarea>
+        </div>
+        <div class="field">
+          <label for="ec">Hata düzeltme</label>
+          <select id="ec">
+            <option value="L">L (en sade kod)</option>
+            <option value="M" selected>M (dengeli)</option>
+            <option value="Q">Q</option>
+            <option value="H">H (en dayanıklı)</option>
+          </select>
+        </div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Konum ve boyut</legend>
+        <div class="field">
+          <div class="head"><label for="size">Boyut</label><span class="val" id="sizeVal"></span></div>
+          <input type="range" id="size" min="5" max="100" step="1" value="28">
+        </div>
+        <div class="field">
+          <span class="lbl">Hızlı konum</span>
+          <div class="pos" id="pos">
+            <button type="button" data-p="0,0" aria-label="Sol üst"></button>
+            <button type="button" data-p="1,0" aria-label="Üst orta"></button>
+            <button type="button" data-p="2,0" aria-label="Sağ üst"></button>
+            <button type="button" data-p="0,1" aria-label="Sol orta"></button>
+            <button type="button" data-p="1,1" aria-label="Orta"></button>
+            <button type="button" data-p="2,1" aria-label="Sağ orta"></button>
+            <button type="button" data-p="0,2" aria-label="Sol alt"></button>
+            <button type="button" data-p="1,2" aria-label="Alt orta"></button>
+            <button type="button" data-p="2,2" aria-label="Sağ alt"></button>
+          </div>
+        </div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Stil</legend>
+        <div class="row">
+          <div class="field"><label for="dark">Kod rengi</label><input type="color" id="dark" value="#111111"></div>
+          <div class="field"><label for="light">Zemin rengi</label><input type="color" id="light" value="#ffffff"></div>
+        </div>
+        <label class="check"><input type="checkbox" id="transparent"> Zemini saydam yap</label>
+        <div class="row">
+          <div class="field"><label for="mstyle">Noktalar</label>
+            <select id="mstyle"><option value="square">Kare</option><option value="round">Yuvarlak köşe</option><option value="dot">Nokta</option></select></div>
+          <div class="field"><label for="estyle">Köşe gözleri</label>
+            <select id="estyle"><option value="square">Kare</option><option value="round">Yuvarlak</option></select></div>
+        </div>
+        <div class="field">
+          <div class="head"><label for="quiet">Kenar boşluğu</label><span class="val" id="quietVal"></span></div>
+          <input type="range" id="quiet" min="0" max="6" step="1" value="2">
+        </div>
+        <div class="field">
+          <div class="head"><label for="radius">Kutu köşe yuvarlaklığı</label><span class="val" id="radiusVal"></span></div>
+          <input type="range" id="radius" min="0" max="30" step="1" value="0">
+        </div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Kaydet</legend>
+        <div class="row">
+          <div class="field"><label for="fmt">Biçim</label>
+            <select id="fmt"><option value="png">PNG</option><option value="jpeg">JPEG</option><option value="webp">WebP</option></select></div>
+          <div class="field"><label for="scale">Çözünürlük</label>
+            <select id="scale"><option value="1">Orijinal</option><option value="0.5">Yarısı</option><option value="2">2 kat</option></select></div>
+        </div>
+        <p class="note" id="status" role="status" aria-live="polite"></p>
+        <div class="btns">
+          <button class="btn" id="test" type="button">Taranabilirlik testi</button>
+          <button class="btn primary" id="save" type="button">Kaydet</button>
+        </div>
+      </fieldset>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $("stage"), ctx = stage.getContext("2d");
+  var src = null, natW = 0, natH = 0, PW = 0, PH = 0, baseName = "gorsel", isSample = true;
+  var st = { fx: 0.62, fy: 0.52, fs: 0.28 }; // görsel genişliğine oranlı
+  var qr = null;
+  var KEYS = ["data", "ec", "dark", "light", "mstyle", "estyle", "quiet", "radius", "fmt", "scale"];
+
+  function setStatus(t, cls) { var el = $("status"); el.textContent = t; el.className = "note" + (cls ? " " + cls : ""); }
+
+  // --- Ayarları hatırla ---
+  function saveSettings() {
+    try {
+      var o = {};
+      KEYS.forEach(function (k) { o[k] = $(k).value; });
+      o.transparent = $("transparent").checked;
+      localStorage.setItem("qr-yerlestirici", JSON.stringify(o));
+    } catch (e) {}
+  }
+  function loadSettings() {
+    try {
+      var o = JSON.parse(localStorage.getItem("qr-yerlestirici") || "null");
+      if (!o) return;
+      KEYS.forEach(function (k) { if (o[k] != null) $(k).value = o[k]; });
+      $("transparent").checked = !!o.transparent;
+    } catch (e) {}
+  }
+
+  // --- Örnek görsel ---
+  function makeSample() {
+    var c = document.createElement("canvas"); c.width = 1200; c.height = 800;
+    var g = c.getContext("2d");
+    var sky = g.createLinearGradient(0, 0, 0, 800);
+    sky.addColorStop(0, "#3a5a78"); sky.addColorStop(0.55, "#d9a86c"); sky.addColorStop(1, "#7d5a4a");
+    g.fillStyle = sky; g.fillRect(0, 0, 1200, 800);
+    g.fillStyle = "rgba(255,240,210,.9)"; g.beginPath(); g.arc(300, 300, 70, 0, Math.PI * 2); g.fill();
+    [["#5b4a52", 520, 70], ["#44363f", 600, 90], ["#2b2229", 690, 60]].forEach(function (L, i) {
+      g.fillStyle = L[0]; g.beginPath(); g.moveTo(0, 800);
+      for (var x = 0; x <= 1200; x += 20) g.lineTo(x, L[1] + Math.sin(x / (140 - i * 25) + i * 2) * L[2] * 0.5 + Math.sin(x / 47 + i) * 12);
+      g.lineTo(1200, 800); g.closePath(); g.fill();
+    });
+    return c;
+  }
+  function dims(s) { return { w: s.naturalWidth || s.width, h: s.naturalHeight || s.height }; }
+
+  function setSource(s, name, sample) {
+    var d = dims(s);
+    src = s; natW = d.w; natH = d.h; isSample = !!sample; baseName = name || "gorsel";
+    PW = Math.min(1400, natW); PH = Math.round(PW * natH / natW);
+    stage.width = PW; stage.height = PH;
+    var maxPct = Math.floor(Math.min(1, natH / natW) * 100);
+    $("size").max = String(maxPct);
+    st.fs = Math.min(st.fs, maxPct / 100);
+    clamp();
+    $("hint").textContent = (sample ? "Bu bir örnek görsel. " : "") +
+      "Bir yere dokun: QR oraya gelir. Sürükleyerek taşı, sağ alt köşedeki kareden boyutlandır. Ok tuşları da çalışır (Shift ile büyük adım).";
+    render();
+  }
+
+  function clamp() {
+    var h = natH / natW;
+    st.fs = Math.max(0.05, Math.min(st.fs, Math.min(1, h)));
+    st.fx = Math.max(0, Math.min(st.fx, 1 - st.fs));
+    st.fy = Math.max(0, Math.min(st.fy, h - st.fs));
+    $("size").value = String(Math.round(st.fs * 100));
+    $("sizeVal").textContent = "%" + Math.round(st.fs * 100);
+  }
+
+  // --- QR üretimi ---
+  function buildQR() {
+    var text = $("data").value;
+    qr = null;
+    if (!text) { setStatus("QR içeriği boş. Bir bağlantı ya da metin yaz.", "warn"); return; }
+    try {
+      var m = qrcode(0, $("ec").value);
+      m.addData(text, "Byte"); m.make(); qr = m;
+      checkContrast();
+    } catch (e) {
+      setStatus("Bu içerik QR koda sığmadı. Metni kısalt ya da hata düzeltmeyi düşür.", "warn");
+    }
+  }
+  function lum(hex) {
+    var v = [1, 3, 5].map(function (i) {
+      var c = parseInt(hex.substr(i, 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  }
+  function checkContrast() {
+    var a = lum($("dark").value), b = lum($("light").value);
+    var ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    if ($("transparent").checked) setStatus("Zemin saydam: kodun okunması arkadaki görsele bağlı. Kaydetmeden önce taranabilirlik testini çalıştır.", "warn");
+    else if (a > b) setStatus("Kod rengi zeminden açık. Çoğu okuyucu bunu taramaz.", "warn");
+    else if (ratio < 4) setStatus("Renk kontrastı düşük, taranması zorlaşabilir.", "warn");
+    else setStatus("", "");
+  }
+
+  function rr(g, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    g.moveTo(x + r, y); g.lineTo(x + w - r, y); g.arcTo(x + w, y, x + w, y + r, r);
+    g.lineTo(x + w, y + h - r); g.arcTo(x + w, y + h, x + w - r, y + h, r);
+    g.lineTo(x + r, y + h); g.arcTo(x, y + h, x, y + h - r, r);
+    g.lineTo(x, y + r); g.arcTo(x, y, x + r, y, r); g.closePath();
+  }
+
+  function inEye(r, c, n) { return (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7); }
+
+  function drawQR(g, x, y, size) {
+    if (!qr) return;
+    var n = qr.getModuleCount(), q = parseInt($("quiet").value, 10);
+    var m = size / (n + q * 2), dark = $("dark").value, light = $("light").value;
+    var ms = $("mstyle").value, round = $("estyle").value === "round";
+    var boxR = parseInt($("radius").value, 10) / 100 * size;
+    if (!$("transparent").checked) {
+      g.fillStyle = light; g.beginPath(); rr(g, x, y, size, size, boxR); g.fill();
+    }
+    g.fillStyle = dark;
+    var ox = x + q * m, oy = y + q * m, r, c;
+    for (r = 0; r < n; r++) {
+      for (c = 0; c < n; c++) {
+        if (!qr.isDark(r, c) || inEye(r, c, n)) continue;
+        if (ms === "square") {
+          var x0 = Math.round(ox + c * m), x1 = Math.round(ox + (c + 1) * m);
+          var y0 = Math.round(oy + r * m), y1 = Math.round(oy + (r + 1) * m);
+          g.fillRect(x0, y0, x1 - x0, y1 - y0);
+        } else if (ms === "round") {
+          g.beginPath(); rr(g, ox + c * m, oy + r * m, m, m, m * 0.35); g.fill();
+        } else {
+          g.beginPath(); g.arc(ox + (c + 0.5) * m, oy + (r + 0.5) * m, m * 0.46, 0, Math.PI * 2); g.fill();
+        }
+      }
+    }
+    [[0, 0], [0, n - 7], [n - 7, 0]].forEach(function (p) {
+      var ex = ox + p[1] * m, ey = oy + p[0] * m;
+      g.beginPath();
+      rr(g, ex, ey, 7 * m, 7 * m, round ? 2 * m : 0);
+      rr(g, ex + m, ey + m, 5 * m, 5 * m, round ? 1.2 * m : 0);
+      g.fill("evenodd");
+      g.beginPath(); rr(g, ex + 2 * m, ey + 2 * m, 3 * m, 3 * m, round ? 1.1 * m : 0); g.fill();
+    });
+  }
+
+  function render() {
+    if (!src) return;
+    ctx.clearRect(0, 0, PW, PH);
+    ctx.drawImage(src, 0, 0, PW, PH);
+    var x = st.fx * PW, y = st.fy * PW, s = st.fs * PW;
+    drawQR(ctx, x, y, s);
+    var k = PW / (stage.getBoundingClientRect().width || PW);
+    var accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#d9480f";
+    ctx.save();
+    ctx.lineWidth = 2 * k; ctx.strokeStyle = accent; ctx.fillStyle = accent;
+    ctx.setLineDash([6 * k, 4 * k]);
+    ctx.strokeRect(x - k, y - k, s + 2 * k, s + 2 * k);
+    ctx.setLineDash([]);
+    var hs = 16 * k; ctx.fillRect(x + s - hs / 2, y + s - hs / 2, hs, hs);
+    ctx.restore();
+  }
+
+  // --- Sürükle / boyutlandır ---
+  var drag = null;
+  function pt(e) {
+    var r = stage.getBoundingClientRect(), k = PW / r.width;
+    return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k, k: k };
+  }
+  stage.addEventListener("pointerdown", function (e) {
+    if (!src) return;
+    var p = pt(e), x = st.fx * PW, y = st.fy * PW, s = st.fs * PW, hit = 20 * p.k;
+    stage.setPointerCapture(e.pointerId);
+    if (Math.abs(p.x - (x + s)) < hit && Math.abs(p.y - (y + s)) < hit) {
+      drag = { mode: "resize", px: p.x, py: p.y, fs: st.fs };
+    } else if (p.x >= x && p.x <= x + s && p.y >= y && p.y <= y + s) {
+      drag = { mode: "move", ox: p.x - x, oy: p.y - y };
+    } else {
+      st.fx = (p.x - s / 2) / PW; st.fy = (p.y - s / 2) / PW; clamp();
+      drag = { mode: "move", ox: s / 2, oy: s / 2 }; render();
+    }
+  });
+  stage.addEventListener("pointermove", function (e) {
+    if (!drag) return;
+    var p = pt(e);
+    if (drag.mode === "move") { st.fx = (p.x - drag.ox) / PW; st.fy = (p.y - drag.oy) / PW; }
+    else { st.fs = drag.fs + ((p.x - drag.px) + (p.y - drag.py)) / 2 / PW; }
+    clamp(); render();
+  });
+  function end() { drag = null; }
+  stage.addEventListener("pointerup", end);
+  stage.addEventListener("pointercancel", end);
+  stage.addEventListener("keydown", function (e) {
+    var step = e.shiftKey ? 0.05 : 0.01, used = true;
+    if (e.key === "ArrowLeft") st.fx -= step; else if (e.key === "ArrowRight") st.fx += step;
+    else if (e.key === "ArrowUp") st.fy -= step; else if (e.key === "ArrowDown") st.fy += step;
+    else used = false;
+    if (used) { e.preventDefault(); clamp(); render(); }
+  });
+  window.addEventListener("resize", render);
+
+  // --- Hızlı konum ---
+  $("pos").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b || !src) return;
+    var p = b.dataset.p.split(",").map(Number), h = natH / natW, mg = 0.04;
+    st.fx = p[0] === 0 ? mg : p[0] === 1 ? (1 - st.fs) / 2 : 1 - st.fs - mg;
+    st.fy = p[1] === 0 ? mg : p[1] === 1 ? (h - st.fs) / 2 : h - st.fs - mg;
+    clamp(); render();
+  });
+
+  // --- Kontroller ---
+  $("size").addEventListener("input", function () { st.fs = parseInt($("size").value, 10) / 100; clamp(); render(); });
+  function labels() {
+    $("quietVal").textContent = $("quiet").value + " modül";
+    $("radiusVal").textContent = "%" + $("radius").value;
+  }
+  ["quiet", "radius", "dark", "light", "mstyle", "estyle", "transparent"].forEach(function (id) {
+    $(id).addEventListener("input", function () { labels(); checkContrast(); saveSettings(); render(); });
+  });
+  $("data").addEventListener("input", function () { buildQR(); saveSettings(); render(); });
+  $("ec").addEventListener("change", function () { buildQR(); saveSettings(); render(); });
+  ["fmt", "scale"].forEach(function (id) { $(id).addEventListener("change", saveSettings); });
+
+  // --- Görsel yükleme ---
+  function loadFile(f) {
+    if (!f || f.type.indexOf("image/") !== 0) { setStatus("Bu dosya bir görsel değil.", "warn"); return; }
+    var url = URL.createObjectURL(f), im = new Image();
+    im.onload = function () { setSource(im, f.name.replace(/\.[^.]+$/, "") || "gorsel", false); buildQR(); render(); };
+    im.onerror = function () { setStatus("Görsel açılamadı. Başka bir dosya dene.", "warn"); };
+    im.src = url;
+  }
+  $("pick").addEventListener("click", function () { $("file").click(); });
+  $("file").addEventListener("change", function () { loadFile($("file").files[0]); $("file").value = ""; });
+  $("sample").addEventListener("click", function () { setSource(makeSample(), "ornek", true); });
+  var box = document.querySelector(".stage-box");
+  box.addEventListener("dragover", function (e) { e.preventDefault(); });
+  box.addEventListener("drop", function (e) { e.preventDefault(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+  document.addEventListener("paste", function (e) {
+    var items = (e.clipboardData && e.clipboardData.files) || [];
+    if (items[0] && items[0].type.indexOf("image/") === 0) loadFile(items[0]);
+  });
+
+  // --- Dışa aktarma ---
+  function exportCanvas() {
+    var sc = parseFloat($("scale").value), W = Math.max(1, Math.round(natW * sc)), H = Math.max(1, Math.round(natH * sc));
+    var c = document.createElement("canvas"); c.width = W; c.height = H;
+    var g = c.getContext("2d");
+    g.drawImage(src, 0, 0, W, H);
+    drawQR(g, st.fx * W, st.fy * W, st.fs * W);
+    return c;
+  }
+  $("save").addEventListener("click", function () {
+    if (!src) return;
+    if (!qr) { setStatus("Kaydetmeden önce geçerli bir QR içeriği gir.", "warn"); return; }
+    var fmt = $("fmt").value, mime = "image/" + fmt, ext = fmt === "jpeg" ? "jpg" : fmt;
+    exportCanvas().toBlob(function (blob) {
+      if (!blob) { setStatus("Görsel oluşturulamadı. Boyutu küçültmeyi dene.", "warn"); return; }
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = baseName + "-qr." + ext;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      setStatus("Kaydedildi: " + baseName + "-qr." + ext, "ok");
+    }, mime, 0.92);
+  });
+  $("test").addEventListener("click", function () {
+    if (!src || !qr) { setStatus("Önce geçerli bir QR içeriği gir.", "warn"); return; }
+    if (!("BarcodeDetector" in window)) {
+      setStatus("Bu tarayıcı yerleşik QR okuyucu sunmuyor. Telefon kameranla ekrandan dene.", "warn"); return;
+    }
+    var text = $("data").value;
+    new BarcodeDetector({ formats: ["qr_code"] }).detect(exportCanvas()).then(function (res) {
+      if (!res.length) setStatus("Kod okunamadı. Zemini opak yap, kontrastı artır ya da boyutu büyüt.", "warn");
+      else if (res[0].rawValue !== text) setStatus("Kod okundu ama içerik farklı çıktı. Stili sadeleştir.", "warn");
+      else setStatus("Test geçti: kod okunuyor ve içerik doğru.", "ok");
+    }, function () { setStatus("Test çalışmadı. Telefon kameranla ekrandan dene.", "warn"); });
+  });
+
+  loadSettings(); labels();
+  buildQR();
+  setSource(makeSample(), "ornek", true);
+})();
+</script>
+</body>
+</html>

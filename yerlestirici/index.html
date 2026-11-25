@@ -66,7 +66,10 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
 <body>
 <div class="wrap">
   <header>
-    <h1>MikroQR — Görsel Yerleştirici</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <h1>MikroQR — Görsel Yerleştirici</h1>
+      <button class="btn primary" id="backToStudio" type="button">← QR Stüdyosuna dön</button>
+    </div>
     <p class="lead">Görseli yükle, QR'ın yerleşeceği yeri sahnede seç. Sürükle, köşesinden boyutlandır, stilini ayarla. Görselin geri kalanı değişmez. Her şey tarayıcında çalışır, hiçbir dosya dışarı gönderilmez.</p>
   </header>
 
@@ -174,7 +177,7 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
   var stage = $("stage"), ctx = stage.getContext("2d");
   var src = null, natW = 0, natH = 0, PW = 0, PH = 0, baseName = "gorsel", isSample = true;
   var st = { fx: 0.62, fy: 0.52, fs: 0.28 }; // görsel genişliğine oranlı
-  var qr = null;
+  var qr = null, styledQR = null;
   var KEYS = ["data", "ec", "dark", "light", "mstyle", "estyle", "quiet", "radius", "fmt", "scale"];
 
   function setStatus(t, cls) { var el = $("status"); el.textContent = t; el.className = "note" + (cls ? " " + cls : ""); }
@@ -277,6 +280,10 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
   function inEye(r, c, n) { return (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7); }
 
   function drawQR(g, x, y, size) {
+    if (styledQR && styledQR.complete && styledQR.naturalWidth) {
+      g.drawImage(styledQR, x, y, size, size);
+      return;
+    }
     if (!qr) return;
     var n = qr.getModuleCount(), q = parseInt($("quiet").value, 10);
     var m = size / (n + q * 2), dark = $("dark").value, light = $("light").value;
@@ -442,6 +449,23 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     }, function () { setStatus("Test çalışmadı. Telefon kameranla ekrandan dene.", "warn"); });
   });
 
+
+
+  // Ana stüdyodan gelen tasarlanmış QR görselini aynen kullan.
+  window.addEventListener("message", function (event) {
+    if (event.origin !== window.location.origin || !event.data || event.data.type !== "mikroqr:styled-qr") return;
+    var image = new Image();
+    image.onload = function () { styledQR = image; render(); };
+    image.src = event.data.dataUrl;
+  });
+
+  $("backToStudio").addEventListener("click", function () {
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: "mikroqr:back-to-studio" }, window.location.origin);
+    } else {
+      window.location.href = "../index.html";
+    }
+  });
   loadSettings(); labels();
   buildQR();
   setSource(makeSample(), "ornek", true);

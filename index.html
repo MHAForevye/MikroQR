@@ -161,6 +161,17 @@ initImage();renderShapes();renderPresets();renderPalette();syncControls();loadLi
   const studioButton = document.getElementById('showStudio');
   const placerButton = document.getElementById('showPlacer');
   if (!studioButton || !placerButton) return;
+  function sendStyledQR() {
+    const frame = document.getElementById('placerFrame');
+    const qrCanvas = document.getElementById('qr');
+    if (!frame || !frame.contentWindow || !qrCanvas || !qrCanvas.width) return;
+    try {
+      frame.contentWindow.postMessage({
+        type: 'mikroqr:styled-qr',
+        dataUrl: qrCanvas.toDataURL('image/png')
+      }, window.location.origin);
+    } catch (err) { console.warn('Tasarlanmış QR aktarılamadı:', err); }
+  }
   function setView(view) {
     const placer = view === 'placer';
     document.body.classList.toggle('placer-mode', placer);
@@ -169,9 +180,20 @@ initImage();renderShapes();renderPresets();renderPalette();syncControls();loadLi
       : 'MikroQR — QR Tasarım ve Görsel Stüdyosu';
     if (placer) {
       const frame = document.getElementById('placerFrame');
-      if (frame && !frame.dataset.started) frame.dataset.started = 'true';
+      if (frame) {
+        if (!frame.dataset.started) frame.dataset.started = 'true';
+        if (frame.contentWindow) sendStyledQR();
+      }
     }
   }
+  const frame = document.getElementById('placerFrame');
+  if (frame) frame.addEventListener('load', function () {
+    if (document.body.classList.contains('placer-mode')) sendStyledQR();
+  });
+  window.addEventListener('message', function (event) {
+    if (event.origin !== window.location.origin || !event.data || event.data.type !== 'mikroqr:back-to-studio') return;
+    setView('studio');
+  });
   placerButton.addEventListener('click', function () { setView('placer'); });
   studioButton.addEventListener('click', function () { setView('studio'); });
   if (window.location.hash === '#yerlestirici') setView('placer');

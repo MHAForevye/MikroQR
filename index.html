@@ -1,203 +1,1245 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b0d12"><title>MikroQR — QR Tasarım ve Görsel Stüdyosu</title>
-<style>
-:root{color-scheme:dark;--bg:#0b0d12;--panel:#151923;--panel2:#1b2230;--line:#293243;--ink:#e8edf6;--muted:#96a2b7;--accent:#8a7dff;--accent2:#4de0c1;--danger:#ff7979}
-*{box-sizing:border-box}::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#2c3548;border-radius:8px}::-webkit-scrollbar-track{background:transparent}body{margin:0;background:radial-gradient(ellipse at 20% -10%,#272348 0,transparent 45%),var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#0b0d12eF;backdrop-filter:blur(15px);z-index:3}
-.logo{font-weight:800;letter-spacing:.3px}.logo span{color:var(--accent2)}.top{display:flex;gap:9px;flex-wrap:wrap}
-button,select,input,textarea{font:inherit;color:inherit}button{background:var(--panel2);border:1px solid var(--line);padding:10px 13px;border-radius:12px;cursor:pointer;transition:.15s}button:hover{border-color:var(--accent);transform:translateY(-1px)}button.primary{background:linear-gradient(135deg,#7667f8,#a28cff);color:#fff;border:0;font-weight:700}button.small{padding:7px 10px;font-size:13px}button.active{border-color:var(--accent2);background:#243b3b}
-main{display:grid;grid-template-columns:290px minmax(320px,1fr) 310px;gap:16px;padding:16px;max-width:1600px;margin:auto}.panel{background:linear-gradient(180deg,#171c27,#131720);border:1px solid var(--line);border-radius:18px;overflow:hidden}.panel h2{font-size:14px;letter-spacing:.07em;text-transform:uppercase;color:#b6c1d4;margin:0;padding:16px;border-bottom:1px solid var(--line)}.panelbody{padding:15px}
-.left{height:calc(100vh - 100px);position:sticky;top:86px;overflow:auto}.center{min-width:0}.right{height:calc(100vh - 100px);position:sticky;top:86px;overflow:auto}
-.nav{display:grid;gap:7px}.nav button{text-align:left;background:transparent;border-color:transparent;color:var(--muted)}.nav button:hover,.nav button.active{background:var(--panel2);border-color:var(--line);color:var(--ink)}
-label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}input[type=text],textarea,select{width:100%;background:#0e121a;border:1px solid var(--line);border-radius:10px;padding:10px;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--accent)}textarea{resize:vertical;min-height:72px}input[type=color]{height:38px;width:100%;border:0;background:none;padding:0}input[type=range]{width:100%;accent-color:var(--accent)}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hint{color:var(--muted);font-size:12px}.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.shape{padding:9px 5px;font-size:12px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}.glyph{width:28px;height:28px;background:var(--ink);display:block}.shape.selected{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2)}.shapegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.previewwrap{display:flex;align-items:center;justify-content:center;min-height:480px;padding:25px;background:radial-gradient(circle,#252b3a,transparent 70%);position:relative}.preview{width:min(100%,420px);aspect-ratio:1;background:#0d1117;border:1px solid var(--line);border-radius:15px;padding:0;overflow:hidden;box-shadow:0 30px 90px #000a,0 0 0 1px #ffffff08;transition:background .2s;display:flex;align-items:center;justify-content:center;position:relative}.preview canvas{max-width:100%;max-height:100%;width:100%;height:100%;display:block}.empty{color:#566174;text-align:center}.toolbar{display:flex;justify-content:space-between;align-items:center;padding:14px;border-top:1px solid var(--line);gap:8px;flex-wrap:wrap}.toolbar .group{display:flex;gap:8px;flex-wrap:wrap}.stat{font-size:12px;color:var(--muted)}.tabs{display:flex;gap:6px;overflow:auto;padding:12px}.tabs button{white-space:nowrap}.palette{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.swatch{height:34px;border-radius:8px;border:1px solid #ffffff22;cursor:pointer}.presets{display:grid;grid-template-columns:1fr 1fr;gap:8px}.preset{font-size:12px;text-align:left;min-height:65px}.preset strong{display:block;margin-bottom:4px}.section{padding-bottom:15px;border-bottom:1px solid var(--line);margin-bottom:14px}.section:last-child{border:0}.toggle{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px;margin:10px 0}.toggle input{accent-color:var(--accent)}.warning{color:#ffd38a;background:#3a2d1c;border:1px solid #594327;padding:10px;border-radius:12px;font-size:12px;margin-top:12px}.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}.result{border:1px solid var(--line);padding:9px;border-radius:12px}.result canvas{width:100%;aspect-ratio:1;background:#0d1117;border-radius:8px}.result button{width:100%;margin-top:6px;font-size:12px}.mobiletabs{display:none}
-@media(max-width:1100px){main{grid-template-columns:240px 1fr}.right{position:static;height:auto;grid-column:1/-1}.left{height:auto;position:static}.right .panelbody{display:grid;grid-template-columns:1fr 1fr;gap:15px}}
-@media(max-width:700px){header{padding:13px}main{display:block;padding:10px}.left,.right{position:static;height:auto;margin-bottom:12px}.center{margin-bottom:12px}.previewwrap{min-height:320px;padding:16px}.preview{max-width:320px}.right .panelbody{display:block}.top .hide-mobile{display:none}.shapegrid{grid-template-columns:repeat(4,1fr)}}
-
-/* MikroQR birleşik uygulama gezinmesi */
-#showStudio { display:none; }
-.studio-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
-#placerShell { display:none; max-width:1600px; margin:12px auto 18px; padding:0; }
-#placerShell .placer-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 16px; color:var(--muted); font-size:13px; }
-#placerShell .placer-heading strong { color:var(--ink); font-size:14px; }
-#placerFrame { display:block; width:100%; height:calc(100vh - 142px); min-height:620px; border:0; background:var(--bg); }
-body.placer-mode main { display:none; }
-body.placer-mode #placerShell { display:block; }
-body.placer-mode #showStudio { display:inline-flex !important; }
-body.placer-mode #showPlacer,
-body.placer-mode .studio-actions { display:none !important; }
-@media(max-width:700px) {
-  #placerShell { margin:8px 0 12px; }
-  #placerShell .placer-heading { align-items:flex-start; flex-direction:column; gap:3px; padding:9px 12px; }
-  #placerFrame { height:calc(100vh - 130px); min-height:680px; }
-}
-
-</style></head><body>
-<header><div class="logo">MIKRO <span>QR</span> / STÜDYO</div><div class="top"><button id="showStudio" class="small" style="display:none">✦ QR Stüdyosu</button><button id="showPlacer" class="small">▣ Görsel Yerleştirici</button><span class="studio-actions"><button id="themeQR" class="small">☾ Koyu QR</button><button id="undo" class="small">↶ Geri</button><button id="redo" class="small">↷ İleri</button><button id="save" class="small hide-mobile">Projeyi Kaydet</button><button id="exportSvg" class="small">SVG</button><button id="exportPng" class="primary small">PNG</button></span></div></header>
-<main>
-<aside class="panel left"><h2>Stüdyo</h2><div class="panelbody">
-<div class="nav"><button class="active">✦ Desen & Modül</button><button id="scanTab">⌁ Scan test</button><button id="batchTab">▣ Arka plan</button><button id="savedTab">♡ Koleksiyon</button></div>
-<div class="section"><label>QR İçeriği</label><textarea id="payload">https://example.com</textarea><div class="hint">URL, metin, Wi-Fi bilgisi veya başka bir payload gir.</div><label>QR hata düzeltme</label><select id="ecc"><option value="L">L — %7</option><option value="M" selected>M — %15</option><option value="Q">Q — %25</option><option value="H">H — %30</option></select></div>
-<div class="section"><label>Modül biçimleri <span id="shapeCount"></span></label><div class="shapegrid" id="shapes"></div></div>
-<div class="section"><label>Hazır tasarım dili</label><div class="presets" id="presets"></div></div>
-</div></aside>
-<section class="panel center"><h2>Canlı Tasarım Alanı</h2><div class="tabs"><button class="active" data-tab="module">Modül</button><button data-tab="finder">Finder</button><button data-tab="color">Renk</button><button data-tab="frame">Çerçeve</button></div>
-<div class="previewwrap"><div class="preview"><canvas id="qr"></canvas><div id="empty" class="empty" style="display:none">QR oluşturuluyor…</div></div></div>
-<div class="toolbar"><div class="group"><button id="pickBg2" class="primary">▣ Arka plan görseli ekle</button><button id="clearBg2" class="small">Kaldır</button><button id="test" class="small">Scan test</button></div><div class="stat" id="status">Hazır</div></div>
-</section>
-<aside class="panel right"><h2>Parametreler</h2><div class="panelbody">
-<div class="section" id="imageSettings"><label>Arka plana göm</label><button id="pickBg" class="primary" style="width:100%">▣ Görsel yükle</button><input id="bgFile" type="file" accept="image/*" hidden><div class="hint" style="margin-top:8px">QR görselin içine gömülür, görsel görünür kalır. Önizlemeye sürükle-bırak da çalışır.</div><label>Örnek arka planlar</label><div class="presets" id="samples"></div><label>Görsel üzerindeki desen gücü <span id="mixVal">0.5</span></label><input id="imgMix" type="range" min=".1" max=".9" step=".05" value=".5"><label>Nokta boyutu <span id="dotVal">0.6</span></label><input id="imgDot" type="range" min=".35" max=".9" step=".05" value=".6"><button id="clearBg" class="small" style="width:100%;margin-top:10px">Arka planı kaldır</button></div>
-<div class="section" id="moduleSettings"><label>Modül boyutu <span id="sizeVal">1</span></label><input id="size" type="range" min=".35" max="1" step=".01" value="1"><label>Optik kalınlık / doluluk <span id="thickVal">0.95</span></label><input id="thick" type="range" min=".5" max="1" step=".01" value=".95"><label>Modül aralığı <span id="gapVal">0</span></label><input id="gap" type="range" min="0" max=".25" step=".01" value="0"><label>Köşe yumuşaklığı <span id="roundVal">0</span></label><input id="round" type="range" min="0" max="1" step=".05" value="0"><label>Desen yoğunluğu / varyasyon</label><input id="variation" type="range" min="0" max=".3" step=".01" value="0"></div>
-<div class="section" id="finderSettings"><label>Finder dış form</label><select id="finderOuter"><option value="square">Kare</option><option value="round">Yumuşak kare</option><option value="circle">Daire</option></select><label>Finder iç form</label><select id="finderInner"><option value="square">Kare</option><option value="circle">Daire</option><option value="dot">Nokta</option></select><label>Finder ölçüsü</label><input id="finderScale" type="range" min=".75" max="1.25" step=".05" value="1"></div>
-<div class="section" id="colorSettings"><div class="two"><div><label>Modül rengi</label><input id="fg" type="color" value="#e8edf6"></div><div><label>Arka plan</label><input id="bgc" type="color" value="#0d1117"></div></div><label>Hazır paletler</label><div class="palette" id="palette"></div><label>Gradient (experimental)</label><select id="gradient"><option value="none">Kapalı</option><option value="horizontal">Yatay</option><option value="vertical">Dikey</option><option value="radial">Radial</option></select><div class="hint">Gradient çıktısı da tarama testine ihtiyaç duyar.</div></div>
-<div class="section" id="frameSettings"><label>Çerçeve / CTA</label><select id="frame"><option value="none">Yok</option><option value="scan">SCAN ME</option><option value="tara">TARA</option><option value="menu">MENÜ</option><option value="wifi">WI-FI</option><option value="card">QR • KART</option></select><label>Quiet zone</label><input id="quiet" type="range" min="2" max="8" step="1" value="4"></div>
-<div class="section"><button id="scan" class="primary" style="width:100%">⚑ Görsel tarama simülasyonu</button><div class="warning">Simülasyon sonucu gerçek kamera testinin yerine geçmez. Finder ve quiet-zone bölgelerini koru.</div><div id="scanResult" class="hint" style="margin-top:10px"></div></div>
-</div></aside>
-</main>
-
-<section id="placerShell" class="panel" aria-label="QR Görsel Yerleştirici">
-  <div class="placer-heading">
-    <strong>Görsel Yerleştirici</strong>
-    <span>QR kodunu görselin istediğin alanına taşı, boyutlandır ve dışa aktar.</span>
-  </div>
-  <iframe id="placerFrame" src="yerlestirici/index.html" title="MikroQR Görsel Yerleştirici" loading="lazy"></iframe>
-</section>
-
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f5f7">
+<meta name="description" content="MikroQR: QR kodlarını tasarla, vektör olarak dışa aktar ve görsellerin üzerine yerleştir. Tamamen tarayıcıda çalışır.">
+<title>MikroQR – QR Tasarım Stüdyosu</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <script src="lib/qrcode.js"></script>
 <script src="lib/qrcode_UTF8.js"></script>
 <script>
-(()=> {
-const shapes=[
-["square","Kare"],["soft","Yumuşak"],["mini","Mini"],["cut","Kesik"],["hollow","Boşluk"],["dot","Nokta"],["microdot","Mikro"],["bigdot","Büyük nokta"],["ring","Halka"],["ringdot","Merkezli"],["cluster","Küme"],["capsuleH","Yatay kapsül"],["capsuleV","Dikey kapsül"],["capsuleS","Kısa kapsül"],["line","Çizgi"],["thickline","Kalın çizgi"],["double","Çift çizgi"],["dash","Kesikli"],["dottedLine","Noktalı"],["arrow","Yönlü"],["diamond","Baklava"],["triangle","Üçgen"],["hex","Altıgen"],["oct","Sekizgen"],["trapezoid","Trapez"],["polygon","Poligon"],["leaf","Yaprak"],["blob","Damla"],["organic","Organik"],["petal","Petal"],["pixel","Pixel"],["block","Blok"],["softblock","Yumuşak blok"],["mosaic","Mozaik"],["cross","Artı"],["star","Yıldız"],["plus","Plus"],["slant","Eğimli"],["vertical","Dikey"],["horizontal","Yatay"],["wave","Dalga"],["corner","Köşe"],["notch","Oyuk"],["square2","Çift kare"],["circleSquare","Daire-kare"],["diamondSmall","Mini baklava"],["dots2","İkili nokta"],["dots3","Üçlü nokta"],["spiral","Spiral"],["ribbon","Şerit"],["random","Seedli mix"]];
-const presets=[["Obsidian","#111827","#f5f5f5","square"],["Soft Dot","#263044","#fffaf0","dot"],["Capsule Flow","#164e63","#e8faf8","capsuleH"],["Neo Geometry","#4c1d95","#f4edff","hex"],["Organic Bloom","#285943","#eff9e9","leaf"],["Micro Mosaic","#161616","#fafafa","mosaic"],["Line Grid","#273449","#f8fafc","line"],["Retro Print","#7c2d12","#fef3c7","diamond"],["Neon Outline","#082f49","#e0f2fe","ring"],["Botanical","#166534","#f0fdf4","petal"],["Monochrome","#000000","#ffffff","square"],["Warm Clay","#9a3412","#ffedd5","blob"],["Ice Crystal","#1e3a8a","#eff6ff","oct"],["Brutalist","#27272a","#fafafa","block"],["Friendly","#0f766e","#ecfeff","soft"]];
-const state={shape:"square",size:1,thick:.95,gap:0,round:0,variation:0,dark:true,imgMix:.5,imgDot:.6,fg:"#e8edf6",bg:"#0d1117",gradient:"none",finderOuter:"square",finderInner:"square",finderScale:1,frame:"none",quiet:4,payload:"https://example.com",ecc:"M",seed:1};
-const canvas=document.querySelector("#qr"),ctx=canvas.getContext("2d");let bgImage=null,matrix=null,history=[],future=[],tab="module",saved=[];
-const $=id=>document.getElementById(id);
-function snapshot(){return JSON.stringify(state)}
-function push(){history.push(snapshot());if(history.length>40)history.shift();future=[]}
-function restore(s){Object.assign(state,JSON.parse(s));$("payload").value=state.payload;sync();makeMatrix()}
-function applyBg(){let p=document.querySelector('.preview');if(p)p.style.background=state.bg}
-function lum(h){let v=parseInt(h.slice(1),16),f=x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};return .2126*f(v>>16&255)+.7152*f(v>>8&255)+.0722*f(v&255)}
-function setStatus(t){$("status").textContent=t}
-function loadOne(u){return new Promise((res,rej)=>{let s=document.createElement("script");s.src=u;s.onload=res;s.onerror=rej;document.head.append(s)})}
-function loadLib(){if(window.qrcode)return Promise.resolve();return loadOne("https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js").catch(()=>loadOne("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"))}
-function makeMatrix(){try{let q=window.qrcode(0,state.ecc);q.addData(state.payload);q.make();matrix=Array.from({length:q.getModuleCount()},(_,r)=>Array.from({length:q.getModuleCount()},(_,c)=>q.isDark(r,c)));draw()}catch(e){matrix=null;setStatus("Payload çok uzun / üretilemedi")}}
-function isFinder(r,c,n){return (r<7&&c<7)||(r<7&&c>=n-7)||(r>=n-7&&c<7)}
-function finderLocation(r,c,n){if(r<7&&c<7)return [r,c];if(r<7&&c>=n-7)return [r,c-(n-7)];if(r>=n-7&&c<7)return [r-(n-7),c];return null}
-function shapePath(x,y,w,h,s){if(s==="random"){const L=["square","dot","soft","diamond","capsuleH","capsuleV","hex","cross"];s=L[Math.abs(Math.floor(x*7+y*13+state.seed*31))%L.length]}let k=state.size;x+=w*(1-k)/2;y+=h*(1-k)/2;w*=k;h*=k;let pad=(1-state.thick)*w*.5; x+=pad;y+=pad;w-=2*pad;h-=2*pad;let rad=Math.min(w,h)*state.round*.5;
-ctx.beginPath();switch(s){
-case"dot":case"microdot":case"bigdot":case"ring":case"ringdot":case"cluster":ctx.arc(x+w/2,y+h/2,Math.min(w,h)*.5,0,Math.PI*2);break;
-case"diamond":case"diamondSmall":ctx.moveTo(x+w/2,y);ctx.lineTo(x+w,y+h/2);ctx.lineTo(x+w/2,y+h);ctx.lineTo(x,y+h/2);ctx.closePath();break;
-case"triangle":ctx.moveTo(x+w/2,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();break;
-case"hex":case"oct":case"polygon":ctx.moveTo(x+w*.25,y);ctx.lineTo(x+w*.75,y);ctx.lineTo(x+w,y+h*.5);ctx.lineTo(x+w*.75,y+h);ctx.lineTo(x+w*.25,y+h);ctx.lineTo(x,y+h*.5);ctx.closePath();break;
-case"capsuleH":case"capsuleS":case"line":case"thickline":case"double":case"dash":case"dottedLine":case"horizontal":case"ribbon":ctx.roundRect(x,y+h*.25,w,h*.5,h*.25);break;
-case"capsuleV":case"vertical":ctx.roundRect(x+w*.25,y,w*.5,h,w*.25);break;
-case"leaf":case"petal":case"blob":case"organic":ctx.ellipse(x+w/2,y+h/2,w*.46,h*.46,Math.PI/4,0,Math.PI*2);break;
-case"arrow":ctx.moveTo(x,y+h*.25);ctx.lineTo(x+w*.65,y+h*.25);ctx.lineTo(x+w*.65,y);ctx.lineTo(x+w,y+h/2);ctx.lineTo(x+w*.65,y+h);ctx.lineTo(x+w*.65,y+h*.75);ctx.lineTo(x,y+h*.75);ctx.closePath();break;
-case"star":ctx.moveTo(x+w/2,y);for(let i=1;i<10;i++){let a=-Math.PI/2+i*Math.PI/5,r=i%2?w*.25:w*.48;ctx.lineTo(x+w/2+Math.cos(a)*r,y+h/2+Math.sin(a)*r)}ctx.closePath();break;
-case"slant":ctx.moveTo(x+w*.2,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w*.8,y+h);ctx.lineTo(x,y+h);ctx.closePath();break;
-default:if(s==="soft"||s==="softblock")ctx.roundRect(x,y,w,h,rad||w*.2);else if(s==="cut"||s==="notch") {ctx.moveTo(x+w*.2,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+h*.8);ctx.lineTo(x+w*.8,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+h*.2);ctx.closePath()}else ctx.rect(x,y,w,h);
-}}
-function drawFinder(x,y,cell,outer,inner){let s0=7*cell,s=s0*state.finderScale;x+=(s0-s)/2;y+=(s0-s)/2;cell=s/7;ctx.fillStyle=state.fg;ctx.beginPath();if(outer==="circle")ctx.arc(x+s/2,y+s/2,s/2,0,6.283);else ctx.roundRect(x,y,s,s,outer==="round"?s*.22:0);ctx.fill();ctx.fillStyle=state.bg;ctx.beginPath();let inset=cell;let m=s-2*inset;if(inner==="circle"||inner==="dot")ctx.arc(x+s/2,y+s/2,m/2,0,6.283);else ctx.rect(x+inset,y+inset,m,m);ctx.fill();ctx.fillStyle=state.fg;ctx.beginPath();let inn=s-4*cell,ix=x+2*cell,iy=y+2*cell;if(inner==="circle"||inner==="dot")ctx.arc(x+s/2,y+s/2,inn/2,0,6.283);else ctx.rect(ix,iy,inn,inn);ctx.fill()}
-function draw(){if(!matrix)return;applyBg();let n=matrix.length,q=state.quiet,cell=bgImage?16:8,total=(n+q*2)*cell;canvas.width=total;canvas.height=total;ctx.fillStyle=state.bg;ctx.fillRect(0,0,total,total);
-if(bgImage)return drawImg(n,q,cell,total);
-let grd=null;if(state.gradient!=="none"){grd=state.gradient==="radial"?ctx.createRadialGradient(total/2,total/2,0,total/2,total/2,total/2):ctx.createLinearGradient(0,0,state.gradient==="vertical"?0:total,state.gradient==="horizontal"?0:total);grd.addColorStop(0,state.fg);grd.addColorStop(1,blend(state.fg,state.bg,.25))}
-ctx.fillStyle=grd||state.fg;let c=cell,offset=q*cell;for(let r=0;r<n;r++)for(let col=0;col<n;col++){if(!matrix[r][col]||isFinder(r,col,n))continue;let chance=state.variation;if(chance&&((r*31+col*17+state.seed)%100)/100<chance)continue;let x=offset+col*c,y=offset+r*c,gap=state.gap*c,w=c-gap,h=c-gap;shapePath(x+gap/2,y+gap/2,w,h,state.shape);ctx.fill()}
-for(let [r,cx] of [[0,0],[0,n-7],[n-7,0]])drawFinder(offset+cx*cell,offset+r*cell,cell,state.finderOuter,state.finderInner);
-if(state.frame!=="none"){ctx.fillStyle=state.fg;ctx.font="bold "+Math.max(14,cell*2)+"px system-ui";ctx.textAlign="center";let label={scan:"SCAN ME",tara:"TARA",menu:"MENÜ",wifi:"WI-FI",card:"QR • KART"}[state.frame];ctx.fillText(label,total/2,total-3)}
+(function(){var t=null;try{t=localStorage.getItem('mikroqr-theme')}catch(e){}
+if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+document.documentElement.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#000000':'#f5f5f7');})();
+</script>
+<style>
+:root{
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --hh:56px;--hh-total:calc(var(--hh) + env(safe-area-inset-top,0px));
+  --r-m:12px;--r-l:18px;
+  color-scheme:light;
+  --bg:#f5f5f7;--surface:#fff;--fill:#f2f2f5;--fill-2:#e6e6eb;--line:rgba(0,0,0,.09);--line-2:rgba(0,0,0,.18);
+  --ink:#1d1d1f;--ink-2:#424245;--muted:#6e6e73;--seg-on:#fff;--header-bg:rgba(245,245,247,.82);
+  --accent:#0071e3;--on-accent:#fff;--accent-soft:rgba(0,113,227,.11);
+  --ok:#1a7f37;--ok-soft:rgba(26,127,55,.12);--warn:#9a5700;--warn-soft:rgba(224,140,0,.16);--bad:#c5221f;--bad-soft:rgba(197,34,31,.11);
+  --shadow-1:0 1px 2px rgba(0,0,0,.04),0 0 0 1px var(--line);
+  --shadow-2:0 10px 34px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.08);
+  --track:rgba(0,0,0,.13);--stage:#ececf0;
+}
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#000;--surface:#1c1c1e;--fill:#2c2c2e;--fill-2:#3a3a3c;--line:rgba(255,255,255,.10);--line-2:rgba(255,255,255,.22);
+  --ink:#f5f5f7;--ink-2:#d1d1d6;--muted:#98989d;--seg-on:#636366;--header-bg:rgba(28,28,30,.8);
+  --accent:#0a84ff;--on-accent:#fff;--accent-soft:rgba(10,132,255,.2);
+  --ok:#30d158;--ok-soft:rgba(48,209,88,.16);--warn:#ffb340;--warn-soft:rgba(255,179,64,.16);--bad:#ff6961;--bad-soft:rgba(255,105,97,.16);
+  --shadow-1:0 0 0 1px var(--line);--shadow-2:0 14px 40px rgba(0,0,0,.6),0 0 0 1px var(--line);
+  --track:rgba(255,255,255,.2);--stage:#111113;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--font);-webkit-font-smoothing:antialiased;min-height:100dvh}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+h1,h2,h3,p{margin:0}
+[hidden]{display:none!important}
+.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Üst çubuk */
+.app-header{position:sticky;top:0;z-index:30;height:var(--hh-total);padding:env(safe-area-inset-top,0) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--header-bg);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
+.brand b{font-weight:700;color:var(--accent)}
+.brand svg{width:28px;height:28px}
+.header-actions{display:flex;align-items:center;gap:8px}
+.nav{width:auto}
+.nav button{display:flex;align-items:center;justify-content:center;gap:7px;padding:0 14px}
+.lbl-short{display:none}
+.menu-wrap{position:relative}
+
+/* Bileşenler */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:0 14px;border-radius:10px;font-weight:500;background:var(--fill);color:var(--ink);transition:background .15s,opacity .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--fill-2)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+.btn.icon{width:34px;padding:0}
+.btn.ghost{background:transparent}
+.btn.ghost:hover{background:var(--fill)}
+.btn.block{width:100%}
+.btn.danger{color:var(--bad)}
+.btn:disabled,.btn[aria-disabled=true]{opacity:.38;pointer-events:none}
+.btn.sm{min-height:28px;padding:0 10px;font-size:13px;border-radius:8px}
+.seg{display:flex;background:var(--fill);border-radius:10px;padding:2px;gap:2px}
+.seg button{flex:1;min-height:32px;padding:0 8px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink-2);transition:background .15s,color .15s;white-space:nowrap}
+.seg button[aria-checked=true],.seg button[aria-pressed=true]{background:var(--seg-on);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px var(--line)}
+.card{background:var(--surface);border-radius:var(--r-l);box-shadow:var(--shadow-1)}
+.card-h{padding:16px 18px 0;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-h h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.card-b{padding:14px 18px 18px}
+.field{display:grid;gap:8px;margin-top:16px}
+.field:first-child,.card-b>.field:first-child{margin-top:0}
+.lbl{font-size:12px;font-weight:500;color:var(--muted);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lbl output{font-variant-numeric:tabular-nums;color:var(--ink-2);font-weight:500}
+.sec{font-size:12px;font-weight:600;color:var(--ink);margin:22px 0 10px;letter-spacing:.01em}
+.sec:first-child{margin-top:0}
+.hint{font-size:12px;color:var(--muted);line-height:1.45}
+input[type=text],input[type=email],input[type=tel],textarea,select{width:100%;background:var(--fill);border:1px solid transparent;border-radius:10px;padding:9px 12px;font:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s;min-height:36px}
+textarea{resize:vertical;min-height:84px;line-height:1.4}
+select{appearance:none;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:0;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--p),var(--track) var(--p))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--track)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;margin-top:-9px;box-shadow:0 1px 5px rgba(0,0,0,.32),0 0 0 .5px rgba(0,0,0,.12)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.32)}
+input[type=range]:focus-visible{outline:0}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent-soft),0 1px 5px rgba(0,0,0,.32)}
+.switch{position:relative;display:inline-block;width:44px;height:26px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:13px;background:var(--track);transition:background .2s}
+.switch span::after{content:"";position:absolute;left:2px;top:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked+span{background:var(--accent)}
+.switch input:checked+span::after{transform:translateX(18px)}
+.switch input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.row-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;font-size:13px}
+.row-sw small{display:block;color:var(--muted);font-size:12px}
+.color{display:flex;align-items:center;gap:8px;background:var(--fill);border-radius:10px;padding:3px 10px 3px 3px;min-height:38px}
+.color input[type=color]{-webkit-appearance:none;appearance:none;width:32px;height:32px;border:0;padding:0;background:none;border-radius:8px;cursor:pointer;flex:none}
+.color input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.color input[type=color]::-webkit-color-swatch{border:0;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)}
+.color input[type=color]::-moz-color-swatch{border:0;border-radius:8px}
+.color input[type=text]{background:transparent;border:0;padding:0 0 0 2px;font-family:var(--mono);font-size:13px;min-height:30px;box-shadow:none;text-transform:uppercase}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tiles{display:grid;gap:8px}
+.tile{display:grid;gap:6px;justify-items:center;align-content:start;padding:10px 4px 8px;border-radius:12px;background:var(--fill);font-size:11px;line-height:1.2;color:var(--ink-2);border:1.5px solid transparent;transition:background .15s,border-color .15s;text-align:center}
+.tile:hover{background:var(--fill-2)}
+.tile[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.tile svg{width:38px;height:38px;color:var(--ink);overflow:visible}
+.tile[aria-pressed=true] svg{color:var(--accent)}
+.tile .risk{width:5px;height:5px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle;background:var(--ok)}
+.tile .risk.m{background:#e0a100}.tile .risk.h{background:var(--bad)}
+.t4{grid-template-columns:repeat(4,1fr)}.t3{grid-template-columns:repeat(3,1fr)}.t2{grid-template-columns:repeat(2,1fr)}
+.preset{padding:10px;gap:8px}
+.preset svg{width:100%;height:auto;aspect-ratio:1;border-radius:8px;box-shadow:0 0 0 1px var(--line)}
+.palette{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.pal{aspect-ratio:1;border-radius:50%;position:relative;box-shadow:0 0 0 1px var(--line-2);overflow:hidden;border:0}
+.pal::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--a) 0 50%,var(--b) 50% 100%)}
+.pal[aria-pressed=true]{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+
+/* Yerleşim */
+.studio{display:grid;grid-template-columns:minmax(280px,330px) minmax(0,1fr) minmax(330px,370px);grid-template-areas:"content preview inspector" "check preview inspector";grid-template-rows:auto 1fr;gap:16px;padding:16px max(16px,env(safe-area-inset-right)) 32px max(16px,env(safe-area-inset-left));max-width:1600px;margin:0 auto;align-items:start}
+#contentCard{grid-area:content}#checkCard{grid-area:check}
+#previewCard{grid-area:preview;position:sticky;top:calc(var(--hh-total) + 16px);overflow:hidden}
+#inspector{grid-area:inspector;position:sticky;top:calc(var(--hh-total) + 16px);max-height:calc(100dvh - var(--hh-total) - 32px);display:flex;flex-direction:column;overflow:hidden}
+.prev-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px}
+.prev-bar .grp{display:flex;gap:4px;align-items:center}
+.stage{display:grid;place-items:center;padding:clamp(16px,4vw,44px);background:var(--stage);min-height:300px}
+.qr-sheet{width:min(100%,520px);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-2);line-height:0}
+.qr-sheet svg{display:block;width:100%;height:auto;max-height:calc(100dvh - 300px)}
+.qr-sheet.is-transparent{background:repeating-conic-gradient(#d4d4d9 0 25%,#fff 0 50%) 0 0/16px 16px}
+.empty{display:grid;justify-items:center;gap:10px;color:var(--muted);text-align:center;padding:40px 10px;line-height:1.4}
+.empty .i{width:36px;height:36px;stroke-width:1.4}
+.prev-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:var(--fill);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}.chip.warn{background:var(--warn-soft);color:var(--warn)}.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip .i{width:14px;height:14px;stroke-width:2.2}
+
+/* Sekmeler */
+.tabbar{display:flex;gap:2px;overflow-x:auto;padding:8px;border-bottom:1px solid var(--line);scrollbar-width:none;flex:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;display:grid;justify-items:center;gap:3px;padding:8px 6px;border-radius:10px;font-size:11px;font-weight:500;color:var(--muted);min-width:48px;transition:background .15s,color .15s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected=true]{color:var(--accent);background:var(--accent-soft)}
+.tab .i{width:20px;height:20px}
+.panels{overflow-y:auto;overscroll-behavior:contain;padding:18px;flex:1;min-height:0}
+.panel[hidden]{display:none}
+
+/* Okunabilirlik */
+.health{display:flex;align-items:center;gap:8px}
+.checks{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:13px;line-height:1.4;color:var(--ink-2)}
+.checks .i{width:18px;height:18px;margin-top:1px;stroke-width:2}
+.checks .ok .i{color:var(--ok)}.checks .warn .i{color:var(--warn)}.checks .bad .i{color:var(--bad)}.checks .idle .i{color:var(--muted)}
+.checks hr{border:0;border-top:1px solid var(--line);width:100%;margin:2px 0}
+.verify{margin-top:14px;display:flex;gap:8px}
+
+/* Dropzone + kayıtlar */
+.drop{display:grid;justify-items:center;gap:8px;padding:22px 14px;border-radius:14px;border:1.5px dashed var(--line-2);color:var(--muted);text-align:center;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.drop .i{width:26px;height:26px}
+.samples{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.samples button{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;box-shadow:0 0 0 1px var(--line)}
+.samples img{width:100%;height:100%;object-fit:cover;display:block}
+.samples span{position:absolute;left:0;right:0;bottom:0;font-size:10px;color:#fff;padding:10px 4px 3px;background:linear-gradient(transparent,rgba(0,0,0,.65));text-align:center}
+.saved{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.saved li{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:12px;background:var(--fill)}
+.saved .th{width:48px;height:48px;border-radius:8px;overflow:hidden;background:#fff;line-height:0}
+.saved .th svg{width:100%;height:100%}
+.saved .nm{font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saved .dt{font-size:11px;color:var(--muted)}
+.saved .act{display:flex;gap:4px}
+.savebar{display:flex;gap:8px}
+
+/* Menü, bildirim */
+.menu{position:absolute;right:0;top:calc(100% + 10px);width:310px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow-2);padding:16px;display:none;z-index:40}
+.menu.open{display:block}
+.menu .field{margin-top:14px}
+.menu .btns{display:flex;gap:8px;margin-top:16px}
+.menu .btns .btn{flex:1}
+.scrim{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.3);display:none}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#1d1d1f;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:opacity .2s,transform .2s;z-index:60;max-width:90vw;text-align:center}
+:root[data-theme=dark] .toast{background:#f5f5f7;color:#1d1d1f}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Yerleştirici kabuğu */
+#placerShell{display:none;height:calc(100dvh - var(--hh-total))}
+#placerFrame{display:block;width:100%;height:100%;border:0;background:var(--bg)}
+body.placer-mode .studio{display:none}
+body.placer-mode #placerShell{display:block}
+
+/* Mobil */
+@media (max-width:1180px){
+  .studio{grid-template-columns:minmax(0,1fr) minmax(320px,360px);grid-template-areas:"preview inspector" "content inspector" "check inspector"}
+}
+@media (max-width:900px){
+  .lbl-long{display:none}.lbl-short{display:inline}
+  .studio{display:flex;flex-direction:column;align-items:stretch;padding:0 0 32px}
+  .studio>*{margin:12px max(12px,env(safe-area-inset-left)) 0 max(12px,env(safe-area-inset-right))}
+  #previewCard{order:-1;position:sticky;top:var(--hh-total);z-index:20;margin:0;border-radius:0 0 var(--r-l) var(--r-l);box-shadow:0 8px 24px rgba(0,0,0,.1),0 0 0 1px var(--line)}
+  .stage{padding:10px;min-height:0}
+  .qr-sheet{width:fit-content;max-width:100%}
+  .qr-sheet svg{max-height:min(30dvh,100vw - 80px);width:auto;max-width:100%;margin:0 auto}
+  .prev-foot{display:none}
+  .prev-bar{padding:6px 10px}.prev-foot{padding:8px 12px}
+  #inspector{position:static;max-height:none;overflow:visible}
+  .panels{overflow:visible}
+  .tabbar{position:sticky;top:var(--prev-h,300px);z-index:15;background:var(--surface);border-radius:var(--r-l) var(--r-l) 0 0}
+  .menu{position:fixed;left:8px;right:8px;top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:auto}
+  .scrim.open{display:block}
+  .header-actions .btn.primary .t{display:none}
+  .header-actions .btn.primary{width:34px;padding:0}
+}
+@media (max-width:900px) and (max-height:560px){#previewCard{position:static}.tabbar{position:static}}
+@media (max-width:420px){.brand span{display:none}.nav button{padding:0 10px}}
+@media (pointer:coarse){
+  .btn{min-height:42px}.btn.icon{width:42px}.btn.sm{min-height:36px}.seg button{min-height:40px}
+  input[type=text],input[type=email],input[type=tel],textarea,select{font-size:16px;min-height:44px}
+  .color input[type=text]{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="i-qr" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M14 14h2.5v2.5H14zM18.5 14h2M14 20.5h2.5M18.5 18v2.5h2"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 15.5l-4.2-4.2-8.3 8.2"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2.5 12h2M19.5 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v11.5"/><path d="M7.5 10.5l4.5 4.5 4.5-4.5"/><path d="M4.5 20h15"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5"/><path d="M8 7.5l4-4 4 4"/><path d="M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4L21.5 20h-19z"/><path d="M12 10v4.5M12 17.4v.1"/></symbol>
+<symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.9v.1"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7M9 7V4.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V7"/></symbol>
+<symbol id="i-shapes" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><circle cx="17" cy="7.25" r="3.25"/><path d="M7.25 13.5l3.25 6.5H4z"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="3.25" transform="rotate(0)"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><rect x="8" y="8" width="8" height="8" rx="2.4"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3c4.6 4.9 7 8.1 7 11.2a7 7 0 0 1-14 0C5 11.1 7.4 7.9 12 3z"/></symbol>
+<symbol id="i-frame" viewBox="0 0 24 24"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16"/><path d="M8 13h8"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5l9 4.8-9 4.8-9-4.8z"/><path d="M3 12.6l9 4.8 9-4.8"/><path d="M3 16.9l9 4.6 9-4.6" opacity=".55"/></symbol>
+<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.5 4h11a1 1 0 0 1 1 1v15L12 15.8 5.5 20V5a1 1 0 0 1 1-1z"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"/></symbol>
+<symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 7h3.2c2.8 0 4.2 1.8 5.6 4.5S14.9 17 17.8 17H21M3 17h3.2c1.4 0 2.4-.5 3.4-1.4M14.4 8.4c1-.9 2-1.4 3.4-1.4H21M18 4l3 3-3 3M18 14l3 3-3 3"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.6 16a5 5 0 0 1 6.8 0"/><path d="M12 19.5v.1"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.8 7.2l8.2 6 8.2-6"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6"/><path d="M10.5 18.5h3"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+<symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16M4 12h16"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v12.5A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5z"/><path d="M8 4v4.5h7V4M8 21v-6h8v6"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+</defs>
+</svg>
+
+<header class="app-header">
+  <a class="brand" href="./" aria-label="MikroQR ana sayfa">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><g fill="none" stroke="#fff" stroke-width="2.2"><rect x="6.5" y="6.5" width="7.5" height="7.5" rx="2"/><rect x="18" y="6.5" width="7.5" height="7.5" rx="2"/><rect x="6.5" y="18" width="7.5" height="7.5" rx="2"/></g><g fill="#fff"><rect x="9" y="9" width="2.5" height="2.5" rx=".7"/><rect x="20.5" y="9" width="2.5" height="2.5" rx=".7"/><rect x="9" y="20.5" width="2.5" height="2.5" rx=".7"/><rect x="19" y="19" width="3" height="3" rx=".9"/><rect x="23" y="23" width="2.5" height="2.5" rx=".8"/></g></svg>
+    <span>Mikro<b>QR</b></span>
+  </a>
+  <nav class="seg nav" aria-label="Araçlar">
+    <button id="showStudio" type="button" aria-pressed="true"><svg class="i"><use href="#i-qr"/></svg><span class="lbl-long">QR Stüdyosu</span><span class="lbl-short">Stüdyo</span></button>
+    <button id="showPlacer" type="button" aria-pressed="false"><svg class="i"><use href="#i-image"/></svg><span class="lbl-long">Görsel Yerleştirici</span><span class="lbl-short">Yerleştirici</span></button>
+  </nav>
+  <div class="header-actions">
+    <button id="themeBtn" class="btn icon ghost" type="button" aria-label="Temayı değiştir" title="Açık / koyu tema"><svg class="i"><use id="themeUse" href="#i-moon"/></svg></button>
+    <div class="menu-wrap" id="exportWrap">
+      <button id="exportBtn" class="btn primary" type="button" aria-haspopup="true" aria-expanded="false"><svg class="i"><use href="#i-download"/></svg><span class="t">Dışa aktar</span></button>
+      <div class="scrim" id="scrim"></div>
+      <div class="menu" id="exportMenu" role="dialog" aria-label="Dışa aktarma">
+        <div class="field"><div class="lbl">Biçim</div>
+          <div class="seg" role="radiogroup" aria-label="Dosya biçimi" data-seg="xfmt"><button type="button" role="radio" data-v="png">PNG</button><button type="button" role="radio" data-v="svg">SVG (vektör)</button></div></div>
+        <div class="field" id="xsizeField"><div class="lbl">Çözünürlük</div>
+          <div class="seg" role="radiogroup" aria-label="Çözünürlük" data-seg="xsize"><button type="button" role="radio" data-v="512">512</button><button type="button" role="radio" data-v="1024">1024</button><button type="button" role="radio" data-v="2048">2048</button><button type="button" role="radio" data-v="4096">4096</button></div></div>
+        <div class="btns"><button id="xDownload" class="btn primary" type="button"><svg class="i"><use href="#i-download"/></svg>İndir</button></div>
+        <div class="btns"><button id="xCopy" class="btn" type="button"><svg class="i"><use href="#i-copy"/></svg>Kopyala</button><button id="xShare" class="btn" type="button" hidden><svg class="i"><use href="#i-share"/></svg>Paylaş</button></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="studio" id="studio">
+  <section class="card" id="contentCard" aria-labelledby="h-content">
+    <div class="card-h"><h2 id="h-content">İçerik</h2></div>
+    <div class="card-b">
+      <div class="seg" role="radiogroup" aria-label="İçerik türü" data-seg="ctype">
+        <button type="button" role="radio" data-v="text">Metin</button><button type="button" role="radio" data-v="wifi">Wi-Fi</button><button type="button" role="radio" data-v="mail">E-posta</button><button type="button" role="radio" data-v="tel">Telefon</button>
+      </div>
+      <div class="field" data-for="text">
+        <label class="lbl" for="payload">Bağlantı veya metin</label>
+        <textarea id="payload" spellcheck="false" placeholder="https://ornek.com"></textarea>
+        <p class="hint" id="urlHint" hidden>Bağlantıların başında https:// olması telefonların tanımasını kolaylaştırır.</p>
+      </div>
+      <div data-for="wifi" hidden>
+        <div class="field"><label class="lbl" for="cf-ssid">Ağ adı (SSID)</label><input id="cf-ssid" type="text" data-cf="ssid" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label class="lbl" for="cf-pass">Parola</label><input id="cf-pass" type="text" data-cf="pass" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label class="lbl" for="cf-enc">Güvenlik</label><select id="cf-enc" data-cf="enc"><option value="WPA">WPA / WPA2 / WPA3</option><option value="WEP">WEP</option><option value="nopass">Parolasız</option></select></div>
+        <div class="row-sw"><span>Gizli ağ</span><label class="switch"><input type="checkbox" data-cf="hidden" aria-label="Gizli ağ"><span></span></label></div>
+      </div>
+      <div data-for="mail" hidden>
+        <div class="field"><label class="lbl" for="cf-to">Alıcı</label><input id="cf-to" type="email" data-cf="to" autocomplete="off" spellcheck="false" placeholder="ad@ornek.com"></div>
+        <div class="field"><label class="lbl" for="cf-subject">Konu</label><input id="cf-subject" type="text" data-cf="subject"></div>
+        <div class="field"><label class="lbl" for="cf-body">Mesaj</label><textarea id="cf-body" data-cf="body" style="min-height:64px"></textarea></div>
+      </div>
+      <div data-for="tel" hidden>
+        <div class="field"><label class="lbl" for="cf-tel">Telefon numarası</label><input id="cf-tel" type="tel" data-cf="tel" autocomplete="off" placeholder="+90 555 000 00 00"></div>
+      </div>
+      <div class="field">
+        <div class="lbl"><span>Hata düzeltme</span><output id="eccInfo"></output></div>
+        <div class="seg" role="radiogroup" aria-label="Hata düzeltme seviyesi" data-seg="ecc">
+          <button type="button" role="radio" data-v="L">L</button><button type="button" role="radio" data-v="M">M</button><button type="button" role="radio" data-v="Q">Q</button><button type="button" role="radio" data-v="H">H</button>
+        </div>
+        <p class="hint">Yüksek seviye, süslü biçimlerde ve görsel üzerinde okunabilirliği artırır; kodu yoğunlaştırır.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="previewCard" aria-label="Önizleme">
+    <div class="prev-bar">
+      <div class="grp">
+        <button id="undo" class="btn icon ghost" type="button" aria-label="Geri al" title="Geri al (Ctrl+Z)"><svg class="i"><use href="#i-undo"/></svg></button>
+        <button id="redo" class="btn icon ghost" type="button" aria-label="Yinele" title="Yinele (Ctrl+Shift+Z)"><svg class="i"><use href="#i-redo"/></svg></button>
+      </div>
+      <div class="grp"><span class="chip" id="verifyChip" hidden></span><span class="chip" id="healthChip"></span></div>
+    </div>
+    <div class="stage"><div class="qr-sheet" id="sheet"></div></div>
+    <div class="prev-foot">
+      <div class="meta" id="meta"></div>
+      <p class="hint" id="status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <aside class="card" id="inspector" aria-label="Tasarım ayarları">
+    <div class="tabbar" role="tablist" aria-label="Ayar grupları" id="tabbar">
+      <button class="tab" role="tab" id="t-tpl" aria-controls="p-tpl" data-tab="tpl"><svg class="i"><use href="#i-layers"/></svg>Şablon</button>
+      <button class="tab" role="tab" id="t-shape" aria-controls="p-shape" data-tab="shape"><svg class="i"><use href="#i-shapes"/></svg>Biçim</button>
+      <button class="tab" role="tab" id="t-eye" aria-controls="p-eye" data-tab="eye"><svg class="i"><use href="#i-target"/></svg>Gözler</button>
+      <button class="tab" role="tab" id="t-color" aria-controls="p-color" data-tab="color"><svg class="i"><use href="#i-drop"/></svg>Renk</button>
+      <button class="tab" role="tab" id="t-frame" aria-controls="p-frame" data-tab="frame"><svg class="i"><use href="#i-frame"/></svg>Çerçeve</button>
+      <button class="tab" role="tab" id="t-image" aria-controls="p-image" data-tab="image"><svg class="i"><use href="#i-image"/></svg>Görsel</button>
+      <button class="tab" role="tab" id="t-saved" aria-controls="p-saved" data-tab="saved"><svg class="i"><use href="#i-bookmark"/></svg>Kayıtlar</button>
+    </div>
+    <div class="panels">
+      <section class="panel" id="p-tpl" role="tabpanel" aria-labelledby="t-tpl" hidden>
+        <div class="tiles t2" id="presets"></div>
+        <p class="hint" style="margin-top:14px">Şablonlar renk, biçim ve göz stilini birlikte uygular. İçeriğin ve çerçeven korunur.</p>
+      </section>
+
+      <section class="panel" id="p-shape" role="tabpanel" aria-labelledby="t-shape" hidden>
+        <p class="hint" id="imgNote" hidden style="margin-bottom:14px">Görsel modu açık: noktaların boyutu Görsel sekmesinden ayarlanır, biçim seçimi nokta şeklini belirler.</p>
+        <div class="sec">Modül biçimi <span class="hint" id="shapeCount"></span></div>
+        <div class="tiles t4" id="shapes"></div>
+        <div class="sec">İnce ayar</div>
+        <div class="field"><div class="lbl"><label for="r-size">Modül boyutu</label><output data-o="size"></output></div><input id="r-size" type="range" data-k="size" min=".5" max="1" step=".01"></div>
+        <div class="field"><div class="lbl"><label for="r-gap">Modül aralığı</label><output data-o="gap"></output></div><input id="r-gap" type="range" data-k="gap" min="0" max=".3" step=".01"></div>
+        <div class="field"><div class="lbl"><label for="r-round">Köşe yumuşaklığı</label><output data-o="round"></output></div><input id="r-round" type="range" data-k="round" min="0" max="1" step=".05"></div>
+        <div class="field"><div class="lbl"><label for="r-var">Boyut çeşitliliği</label><output data-o="variation"></output></div>
+          <div style="display:flex;gap:8px;align-items:center"><input id="r-var" type="range" data-k="variation" min="0" max=".35" step=".01"><button id="reseed" class="btn icon sm ghost" type="button" aria-label="Rastgeleliği yenile" title="Yeni rastgele düzen"><svg class="i"><use href="#i-shuffle"/></svg></button></div></div>
+        <p class="hint" style="margin-top:12px">Küçük modül ve geniş aralık okunabilirliği düşürür. Kodun bilgisi hiçbir ayarda silinmez.</p>
+      </section>
+
+      <section class="panel" id="p-eye" role="tabpanel" aria-labelledby="t-eye" hidden>
+        <div class="sec">Dış çerçeve</div>
+        <div class="tiles t4" id="eyeOuter"></div>
+        <div class="sec">İç nokta</div>
+        <div class="tiles t4" id="eyeInner"></div>
+        <div class="field"><div class="lbl"><label for="r-fs">Göz ölçeği</label><output data-o="finderScale"></output></div><input id="r-fs" type="range" data-k="finderScale" min=".8" max="1.15" step=".01"></div>
+        <div class="row-sw"><span>Modüllerle aynı renk</span><label class="switch"><input type="checkbox" data-k="eyeSame" aria-label="Göz rengi modüllerle aynı"><span></span></label></div>
+        <div class="field" id="eyeColorField"><div class="lbl">Göz rengi</div><div class="color"><input type="color" data-k="eyeColor" aria-label="Göz rengi"><input type="text" data-hex="eyeColor" maxlength="7" aria-label="Göz rengi (hex)" spellcheck="false"></div></div>
+      </section>
+
+      <section class="panel" id="p-color" role="tabpanel" aria-labelledby="t-color" hidden>
+        <div class="two">
+          <div class="field"><div class="lbl">Modül rengi</div><div class="color"><input type="color" data-k="fg" aria-label="Modül rengi"><input type="text" data-hex="fg" maxlength="7" aria-label="Modül rengi (hex)" spellcheck="false"></div></div>
+          <div class="field"><div class="lbl">Zemin</div><div class="color"><input type="color" data-k="bg" aria-label="Zemin rengi"><input type="text" data-hex="bg" maxlength="7" aria-label="Zemin rengi (hex)" spellcheck="false"></div></div>
+        </div>
+        <div class="row-sw"><span>Saydam zemin<small>PNG ve SVG çıktısında</small></span><label class="switch"><input type="checkbox" data-k="transparent" aria-label="Saydam zemin"><span></span></label></div>
+        <div class="sec">Renk geçişi</div>
+        <div class="seg" role="radiogroup" aria-label="Renk geçişi" data-seg="gradient">
+          <button type="button" role="radio" data-v="none">Yok</button><button type="button" role="radio" data-v="horizontal">Yatay</button><button type="button" role="radio" data-v="vertical">Dikey</button><button type="button" role="radio" data-v="diagonal">Çapraz</button><button type="button" role="radio" data-v="radial">Radyal</button>
+        </div>
+        <div class="field" id="fg2Field"><div class="lbl">Bitiş rengi</div><div class="color"><input type="color" data-k="fg2" aria-label="Geçiş bitiş rengi"><input type="text" data-hex="fg2" maxlength="7" aria-label="Geçiş bitiş rengi (hex)" spellcheck="false"></div></div>
+        <div class="sec">Hazır renk çiftleri</div>
+        <div class="palette" id="palette"></div>
+      </section>
+
+      <section class="panel" id="p-frame" role="tabpanel" aria-labelledby="t-frame" hidden>
+        <div class="sec">Çağrı etiketi</div>
+        <div class="tiles t3" id="frames"></div>
+        <div class="field" id="frameTextField"><label class="lbl" for="frameText">Özel metin</label><input id="frameText" type="text" maxlength="18" placeholder="Menüyü gör" autocomplete="off"></div>
+        <div class="field" id="frameStyleField"><div class="lbl">Etiket stili</div><div class="seg" role="radiogroup" aria-label="Etiket stili" data-seg="frameStyle"><button type="button" role="radio" data-v="fill">Dolgu</button><button type="button" role="radio" data-v="outline">Çizgi</button></div></div>
+        <div class="field"><div class="lbl"><label for="r-quiet">Sessiz bölge</label><output data-o="quiet"></output></div><input id="r-quiet" type="range" data-k="quiet" min="1" max="8" step="1"><p class="hint">Standart en az 4 modüldür. Etiket, sessiz bölgenin dışında konumlanır.</p></div>
+      </section>
+
+      <section class="panel" id="p-image" role="tabpanel" aria-labelledby="t-image" hidden>
+        <div class="drop" id="drop">
+          <svg class="i"><use href="#i-upload"/></svg>
+          <div>Görseli buraya bırak ya da seç</div>
+          <button id="pickBg" class="btn" type="button">Görsel seç</button>
+          <input id="bgFile" type="file" accept="image/*" hidden>
+        </div>
+        <div class="sec">Örnek arka planlar</div>
+        <div class="samples" id="samples"></div>
+        <div id="imgControls" hidden>
+          <div class="field"><div class="lbl"><label for="r-mix">Desen gücü</label><output data-o="imgMix"></output></div><input id="r-mix" type="range" data-k="imgMix" min=".1" max=".9" step=".05"></div>
+          <div class="field"><div class="lbl"><label for="r-dot">Nokta boyutu</label><output data-o="imgDot"></output></div><input id="r-dot" type="range" data-k="imgDot" min=".35" max=".9" step=".05"></div>
+          <button id="clearBg" class="btn block" type="button" style="margin-top:18px"><svg class="i"><use href="#i-trash"/></svg>Görseli kaldır</button>
+        </div>
+        <p class="hint" style="margin-top:14px">QR, görselin içine gömülür; görsel görünür kalır. Gözler her zaman düz zeminde çizilir. Hata düzeltme otomatik H yapılır.</p>
+      </section>
+
+      <section class="panel" id="p-saved" role="tabpanel" aria-labelledby="t-saved" hidden>
+        <div class="savebar"><input id="saveName" type="text" placeholder="Tasarım adı" maxlength="40" autocomplete="off" aria-label="Tasarım adı"><button id="saveBtn" class="btn primary" type="button"><svg class="i"><use href="#i-save"/></svg>Kaydet</button></div>
+        <div class="sec">Kayıtlı tasarımlar</div>
+        <ul class="saved" id="savedList"></ul>
+        <p class="hint" id="savedEmpty" style="margin-top:6px">Henüz kayıt yok. Tasarımlar yalnızca bu cihazın tarayıcısında saklanır.</p>
+      </section>
+    </div>
+  </aside>
+
+  <section class="card" id="checkCard" aria-labelledby="h-check">
+    <div class="card-h"><h2 id="h-check">Okunabilirlik</h2><span class="chip" id="healthChip2"></span></div>
+    <div class="card-b">
+      <ul class="checks" id="checks"></ul>
+      <div class="verify"><button id="verifyBtn" class="btn block" type="button"><svg class="i"><use href="#i-scan"/></svg>Tarama testi</button></div>
+      <p class="hint" id="verifyNote" style="margin-top:10px"></p>
+    </div>
+  </section>
+</main>
+
+<section id="placerShell" aria-label="Görsel Yerleştirici"><iframe id="placerFrame" title="MikroQR Görsel Yerleştirici" data-src="yerlestirici/index.html"></iframe></section>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px">MikroQR çalışmak için JavaScript gerektirir.</p></noscript>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const ls = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); return true; } catch(e){ return false; } }
+};
+const icon = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
+
+/* ---------- Veri tabloları ---------- */
+const SHAPES = [
+  ['square','Kare','l'],['soft','Yuvarlak kare','l'],['circle','Daire','l'],['ring','Halka','h'],
+  ['frameSq','Çerçeveli','h'],['diamond','Baklava','m'],['hex','Altıgen','m'],['octagon','Sekizgen','m'],
+  ['sparkle','Yıldız','h'],['plus','Artı','h'],['cross','Çapraz','h'],['leaf','Yaprak','l'],
+  ['liquid','Akışkan','l'],['hBar','Yatay şerit','l'],['vBar','Dikey şerit','l'],['hCap','Yatay kapsül','l'],
+  ['vCap','Dikey kapsül','l'],['bevel','Kesik köşe','l'],['slant','Eğik','m'],['mosaic','Mozaik','h'],['mix','Karışık','m']
+];
+const SHAPE_IDS = SHAPES.map(s => s[0]);
+const LEGACY_SHAPE = {mini:'square',cut:'bevel',hollow:'frameSq',dot:'circle',microdot:'circle',bigdot:'circle',ringdot:'ring',cluster:'circle',capsuleH:'hCap',capsuleV:'vCap',capsuleS:'hCap',line:'hBar',thickline:'hBar',double:'hBar',dash:'hBar',dottedLine:'circle',arrow:'slant',triangle:'diamond',oct:'octagon',trapezoid:'bevel',polygon:'hex',petal:'leaf',blob:'liquid',organic:'liquid',pixel:'square',block:'square',softblock:'soft',star:'sparkle',vertical:'vBar',horizontal:'hBar',wave:'liquid',corner:'bevel',notch:'bevel',square2:'frameSq',circleSquare:'soft',diamondSmall:'diamond',dots2:'circle',dots3:'circle',spiral:'circle',ribbon:'hBar',random:'mix'};
+const EYE_OUTER = [['square','Kare'],['round','Yumuşak'],['circle','Daire'],['leaf','Yaprak']];
+const EYE_INNER = [['square','Kare'],['round','Yumuşak'],['circle','Daire'],['leaf','Yaprak']];
+const FRAMES = [['none','Yok'],['scan','SCAN ME'],['tara','TARA'],['menu','MENÜ'],['wifi','WI-FI'],['card','QR KART'],['custom','Özel']];
+const FRAME_TEXT = {scan:'SCAN ME',tara:'TARA',menu:'MENÜ',wifi:'WI-FI',card:'QR KART'};
+const ECC_INFO = {L:'%7 kurtarma',M:'%15 kurtarma',Q:'%25 kurtarma',H:'%30 kurtarma'};
+const MAX_BYTES = {L:2953,M:2331,Q:1663,H:1273};
+const DESIGN_KEYS = ['shape','size','gap','round','variation','fg','bg','fg2','gradient','transparent','eyeSame','eyeColor','finderOuter','finderInner','finderScale'];
+
+const DEF = {
+  shape:'square',size:1,gap:0,round:0,variation:0,seed:1,
+  fg:'#111114',bg:'#ffffff',fg2:'#0a84ff',gradient:'none',transparent:false,eyeSame:true,eyeColor:'#111114',
+  finderOuter:'square',finderInner:'square',finderScale:1,
+  frame:'none',frameText:'',frameStyle:'fill',quiet:4,
+  imgMix:.5,imgDot:.6,
+  ecc:'M',ctype:'text',payload:'https://example.com',
+  cf:{ssid:'',pass:'',enc:'WPA',hidden:false,to:'',subject:'',body:'',tel:''}
+};
+const RANGES = {size:[.5,1],gap:[0,.3],round:[0,1],variation:[0,.35],finderScale:[.8,1.15],quiet:[1,8],imgMix:[.1,.9],imgDot:[.35,.9]};
+const FMT = {
+  size:v=>Math.round(v*100)+'%',gap:v=>Math.round(v*100)+'%',round:v=>Math.round(v*100)+'%',variation:v=>Math.round(v/.35*100)+'%',
+  finderScale:v=>Math.round(v*100)+'%',quiet:v=>v+' modül',imgMix:v=>Math.round(v*100)+'%',imgDot:v=>Math.round(v*100)+'%'
+};
+
+const PRESETS = [
+  ['Klasik',{fg:'#000000',bg:'#ffffff',shape:'square'}],
+  ['Grafit',{fg:'#1c1c1e',bg:'#f5f5f7',shape:'soft',finderOuter:'round',finderInner:'round'}],
+  ['Okyanus',{fg:'#0a3d91',fg2:'#1e90ff',gradient:'diagonal',bg:'#f2f8ff',shape:'circle',finderOuter:'round',finderInner:'circle'}],
+  ['Orman',{fg:'#1f5a3d',bg:'#f3f8f1',shape:'leaf',finderOuter:'leaf',finderInner:'leaf'}],
+  ['Akış',{fg:'#2a2466',fg2:'#6a3df0',gradient:'vertical',bg:'#f4f3ff',shape:'liquid',finderOuter:'round',finderInner:'round'}],
+  ['Kapsül',{fg:'#0f4c5c',bg:'#eef7f8',shape:'hCap',finderOuter:'leaf',finderInner:'circle'}],
+  ['Mimari',{fg:'#2b2b2e',bg:'#ffffff',shape:'vBar',finderOuter:'square',finderInner:'square'}],
+  ['Geometrik',{fg:'#4b2a8a',bg:'#f6f1ff',shape:'hex',finderOuter:'square',finderInner:'square'}],
+  ['Mozaik',{fg:'#111114',bg:'#fafafa',shape:'mosaic',finderOuter:'square',finderInner:'square'}],
+  ['Kil',{fg:'#8a3b12',bg:'#fff4e8',shape:'bevel',finderOuter:'leaf',finderInner:'leaf'}],
+  ['Buz',{fg:'#17418f',bg:'#eef4ff',shape:'octagon',finderOuter:'round',finderInner:'round'}],
+  ['Gün batımı',{fg:'#b42318',fg2:'#6a1b9a',gradient:'diagonal',bg:'#fff8f3',shape:'liquid',finderOuter:'round',finderInner:'circle'}],
+  ['Zümrüt',{fg:'#0b6b50',fg2:'#0a8f9c',gradient:'horizontal',bg:'#effaf5',shape:'circle',finderOuter:'round',finderInner:'round'}],
+  ['Gece',{fg:'#e8edf6',bg:'#0d1117',shape:'soft',finderOuter:'round',finderInner:'round'}]
+];
+const PALETTE = [
+  ['Siyah / Beyaz','#000000','#ffffff'],['Grafit / Buz','#1c1c1e','#f5f5f7'],['Lacivert / Bulut','#0b2a5b','#eef3ff'],
+  ['Mavi / Gök','#0a5fd8','#eef5ff'],['Zümrüt / Nane','#0f6b4f','#effaf5'],['Orman / Çimen','#1f5a3d','#f3f8f1'],
+  ['Bordo / Pembe','#7a1230','#fff1f4'],['Kehribar / Krem','#8a3b12','#fff4e8'],['Mor / Lavanta','#4b2a8a','#f6f1ff'],
+  ['Petrol / Su','#0f4c5c','#eef7f8'],['Antrasit / Kum','#2b2b2e','#fbf7ee'],['Gece','#e8edf6','#0d1117']
+];
+
+/* ---------- Renk yardımcıları ---------- */
+const HEX = /^#[0-9a-f]{6}$/i;
+function normHex(v, fb){
+  v = String(v || '').trim();
+  if (/^[0-9a-f]{3}$/i.test(v)) v = '#' + v;
+  if (/^#[0-9a-f]{3}$/i.test(v)) v = '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+  if (/^[0-9a-f]{6}$/i.test(v)) v = '#' + v;
+  return HEX.test(v) ? v.toLowerCase() : fb;
+}
+function lum(h){
+  const v = parseInt(h.slice(1), 16), f = x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); };
+  return .2126 * f(v >> 16 & 255) + .7152 * f(v >> 8 & 255) + .0722 * f(v & 255);
+}
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const xml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+
+/* ---------- Durum ---------- */
+function normalize(o){
+  const s = JSON.parse(JSON.stringify(DEF));
+  if (!o || typeof o !== 'object') return s;
+  for (const k of Object.keys(RANGES)) if (o[k] != null && isFinite(+o[k])) s[k] = clamp(+o[k], RANGES[k][0], RANGES[k][1]);
+  s.quiet = Math.round(s.quiet);
+  let sh = LEGACY_SHAPE[o.shape] || o.shape;
+  s.shape = SHAPE_IDS.includes(sh) ? sh : DEF.shape;
+  for (const k of ['fg','bg','fg2','eyeColor']) s[k] = normHex(o[k], DEF[k]);
+  if (o.eyeColor == null) s.eyeColor = s.fg;
+  s.gradient = ['none','horizontal','vertical','diagonal','radial'].includes(o.gradient) ? o.gradient : 'none';
+  s.transparent = !!o.transparent;
+  s.eyeSame = o.eyeSame == null ? true : !!o.eyeSame;
+  let fo = o.finderOuter, fi = o.finderInner === 'dot' ? 'circle' : o.finderInner;
+  s.finderOuter = EYE_OUTER.some(e => e[0] === fo) ? fo : 'square';
+  s.finderInner = EYE_INNER.some(e => e[0] === fi) ? fi : 'square';
+  s.frame = FRAMES.some(f => f[0] === o.frame) ? o.frame : 'none';
+  s.frameText = String(o.frameText || '').slice(0, 18);
+  s.frameStyle = o.frameStyle === 'outline' ? 'outline' : 'fill';
+  s.seed = isFinite(+o.seed) ? Math.floor(+o.seed) : 1;
+  s.ecc = ['L','M','Q','H'].includes(o.ecc) ? o.ecc : 'M';
+  s.ctype = ['text','wifi','mail','tel'].includes(o.ctype) ? o.ctype : 'text';
+  s.payload = typeof o.payload === 'string' ? o.payload : DEF.payload;
+  if (o.cf && typeof o.cf === 'object') {
+    for (const k of Object.keys(s.cf)) if (o.cf[k] != null) s.cf[k] = k === 'hidden' ? !!o.cf[k] : String(o.cf[k]);
+    if (!['WPA','WEP','nopass'].includes(s.cf.enc)) s.cf.enc = 'WPA';
+  }
+  return s;
+}
+let state = normalize(null);
+let matrix = null, errorMsg = '';
+let img = null;           // {el,url,w,h,lum,lumKey}
+let uid = 0;
+
+function buildPayload(st){
+  const f = st.cf;
+  switch (st.ctype) {
+    case 'wifi': {
+      if (!f.ssid) return '';
+      const e = s => s.replace(/([\\;,:"])/g, '\\$1');
+      return 'WIFI:T:' + f.enc + ';S:' + e(f.ssid) + ';' + (f.enc === 'nopass' ? '' : 'P:' + e(f.pass) + ';') + (f.hidden ? 'H:true;' : '') + ';';
+    }
+    case 'mail': {
+      if (!f.to.trim()) return '';
+      const p = [];
+      if (f.subject) p.push('subject=' + encodeURIComponent(f.subject));
+      if (f.body) p.push('body=' + encodeURIComponent(f.body));
+      return 'mailto:' + f.to.trim() + (p.length ? '?' + p.join('&') : '');
+    }
+    case 'tel': { const t = f.tel.replace(/[^\d+]/g, ''); return t ? 'tel:' + t : ''; }
+    default: return st.payload;
+  }
 }
 
-function luma(h){let v=parseInt(h.slice(1),16);return(.2126*(v>>16&255)+.7152*(v>>8&255)+.0722*(v&255))/255}
-function drawImg(n,q,cell,total){
-const iw=bgImage.width,ih=bgImage.height,sc=Math.max(total/iw,total/ih),dw=iw*sc,dh=ih*sc;
-ctx.drawImage(bgImage,(total-dw)/2,(total-dh)/2,dw,dh);
-const px=ctx.getImageData(0,0,total,total).data,off=q*cell,Lf=luma(state.fg),Lb=luma(state.bg);
-ctx.globalAlpha=.88;ctx.fillStyle=state.bg;
-ctx.fillRect(0,0,total,off);ctx.fillRect(0,total-off,total,off);ctx.fillRect(0,off,off,total-2*off);ctx.fillRect(total-off,off,off,total-2*off);ctx.globalAlpha=1;
-const ks=state.size,kt=state.thick,kr=state.round;
-for(let r=0;r<n;r++)for(let c=0;c<n;c++){if(isFinder(r,c,n))continue;
- const x=off+c*cell,y=off+r*cell;let sum=0,cnt=0;
- for(let yy=y;yy<y+cell;yy+=3)for(let xx=x;xx<x+cell;xx+=3){const i=(yy*total+xx)*4;sum+=(.2126*px[i]+.7152*px[i+1]+.0722*px[i+2])/255;cnt++}
- const Lp=sum/cnt,dark=matrix[r][c],col=dark?state.fg:state.bg,Lt=dark?Lf:Lb;
- ctx.globalAlpha=Math.min(.95,Math.max(0,state.imgMix*(.6+1.6*Math.abs(Lt-Lp))));ctx.fillStyle=col;ctx.fillRect(x,y,cell,cell);ctx.globalAlpha=1;
- const d=cell*state.imgDot;state.size=1;state.thick=1;state.round=Math.max(kr,.3);shapePath(x+(cell-d)/2,y+(cell-d)/2,d,d,state.shape);ctx.fillStyle=col;ctx.fill()}
-state.size=ks;state.thick=kt;state.round=kr;
-for(let [r,cx] of [[0,0],[0,n-7],[n-7,0]])drawFinder(off+cx*cell,off+r*cell,cell,state.finderOuter,state.finderInner);
-if(state.frame!=="none"){ctx.fillStyle=state.fg;ctx.font="bold "+Math.max(14,cell*2)+"px system-ui";ctx.textAlign="center";ctx.fillText({scan:"SCAN ME",tara:"TARA",menu:"MENÜ",wifi:"WI-FI",card:"QR • KART"}[state.frame],total/2,total-cell*.6)}
+/* ---------- Geometri motoru ---------- */
+const f2 = n => Math.round(n * 100) / 100;
+const rect = (x, y, w, h) => `M${f2(x)} ${f2(y)}h${f2(w)}v${f2(h)}h${f2(-w)}z`;
+const rectCCW = (x, y, w, h) => `M${f2(x)} ${f2(y)}v${f2(h)}h${f2(w)}v${f2(-h)}z`;
+function rrect(x, y, w, h, r){
+  let [a, b, c, d] = Array.isArray(r) ? r : [r, r, r, r];
+  const m = Math.min(w, h) / 2;
+  a = Math.min(a, m); b = Math.min(b, m); c = Math.min(c, m); d = Math.min(d, m);
+  if (!(a > .01 || b > .01 || c > .01 || d > .01)) return rect(x, y, w, h);
+  const arc = (r, px, py) => r > .01 ? `A${f2(r)} ${f2(r)} 0 0 1 ${f2(px)} ${f2(py)}` : '';
+  return `M${f2(x + a)} ${f2(y)}H${f2(x + w - b)}${arc(b, x + w, y + b)}V${f2(y + h - c)}${arc(c, x + w - c, y + h)}H${f2(x + d)}${arc(d, x, y + h - d)}V${f2(y + a)}${arc(a, x + a, y)}Z`;
 }
-function mk(){let c=document.createElement("canvas");c.width=c.height=900;return c}
-const samples={
-"Aurora":()=>{let c=mk(),g=c.getContext("2d");g.fillStyle="#0a1020";g.fillRect(0,0,900,900);[[200,250,"#22d3ee"],[650,200,"#8b5cf6"],[450,650,"#10b981"],[780,720,"#ec4899"],[120,760,"#3b82f6"]].forEach(([x,y,col])=>{let r=g.createRadialGradient(x,y,0,x,y,430);r.addColorStop(0,col+"dd");r.addColorStop(1,col+"00");g.fillStyle=r;g.fillRect(0,0,900,900)});return c},
-"Gün batımı":()=>{let c=mk(),g=c.getContext("2d"),l=g.createLinearGradient(0,0,0,900);l.addColorStop(0,"#1e1b4b");l.addColorStop(.5,"#c2410c");l.addColorStop(1,"#fbbf24");g.fillStyle=l;g.fillRect(0,0,900,900);g.fillStyle="#fde68a";g.beginPath();g.arc(450,520,170,0,7);g.fill();[["#7c2d12",640],["#431407",730],["#1c0a05",820]].forEach(([col,y],i)=>{g.fillStyle=col;g.beginPath();g.moveTo(0,900);for(let x=0;x<=900;x+=30)g.lineTo(x,y+Math.sin(x*.012+i*2)*45+Math.sin(x*.03+i)*18);g.lineTo(900,900);g.fill()});return c},
-"Topografik":()=>{let c=mk(),g=c.getContext("2d");g.fillStyle="#0f2a2a";g.fillRect(0,0,900,900);g.lineWidth=3;for(let i=0;i<45;i++){g.strokeStyle="hsl("+(150+i*2)+",55%,"+(35+i%5*6)+"%)";g.beginPath();for(let x=0;x<=900;x+=10){let y=i*21+Math.sin(x*.011+i*.45)*55+Math.sin(x*.027+i*.2)*22;x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke()}return c},
-"Kozmik":()=>{let c=mk(),g=c.getContext("2d"),s=7,R=()=>(s=s*16807%2147483647)/2147483647;g.fillStyle="#05060f";g.fillRect(0,0,900,900);[[300,300,"#6d28d9"],[620,560,"#0e7490"],[760,180,"#be185d"]].forEach(([x,y,col])=>{let r=g.createRadialGradient(x,y,0,x,y,360);r.addColorStop(0,col+"99");r.addColorStop(1,col+"00");g.fillStyle=r;g.fillRect(0,0,900,900)});for(let i=0;i<420;i++){g.globalAlpha=.3+R()*.7;g.fillStyle="#fff";g.beginPath();g.arc(R()*900,R()*900,R()*2.2+.4,0,7);g.fill()}g.globalAlpha=1;return c}};
-function setImage(img){bgImage=img;state.ecc="H";$("ecc").value="H";makeMatrix();setStatus("Arka plan eklendi, hata düzeltme H yapıldı")}
-function clearImage(){bgImage=null;draw();setStatus("Arka plan kaldırıldı")}
-function loadFile(f){if(!f||!f.type.startsWith("image/"))return;let r=new FileReader();r.onload=()=>{let im=new Image();im.onload=()=>setImage(im);im.src=r.result};r.readAsDataURL(f)}
-function initImage(){$("samples").innerHTML=Object.keys(samples).map(k=>`<button class="small" style="min-height:0" data-s="${k}">${k}</button>`).join("");$("samples").onclick=e=>{let b=e.target.closest("[data-s]");if(b)setImage(samples[b.dataset.s]())};
-$("pickBg").onclick=$("pickBg2").onclick=()=>$("bgFile").click();$("bgFile").onchange=e=>{loadFile(e.target.files[0]);e.target.value=""};$("clearBg").onclick=$("clearBg2").onclick=clearImage;
-let pv=document.querySelector(".previewwrap");pv.ondragover=e=>e.preventDefault();pv.ondrop=e=>{e.preventDefault();loadFile(e.dataTransfer.files[0])}}
-function blend(a,b,t){let x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);let r=Math.round(((x>>16)&255)*(1-t)+((y>>16)&255)*t),g=Math.round(((x>>8)&255)*(1-t)+((y>>8)&255)*t),bl=Math.round((x&255)*(1-t)+(y&255)*t);return"#"+[r,g,bl].map(v=>v.toString(16).padStart(2,"0")).join("")}
-function sync(){$("themeQR").textContent=lum(state.bg)<lum(state.fg)?"☀ Açık QR":"☾ Koyu QR";for(let id of ["size","thick","gap","round","variation","fg","bgc","gradient","finderOuter","finderInner","finderScale","frame","quiet","ecc","imgMix","imgDot"])$(id).value=({fg:state.fg,bgc:state.bg}[id]||state[id]);$("sizeVal").textContent=state.size;$("thickVal").textContent=state.thick;$("gapVal").textContent=state.gap;$("roundVal").textContent=state.round;$("mixVal").textContent=state.imgMix;$("dotVal").textContent=state.imgDot;selectShape()}
-function selectShape(){document.querySelectorAll(".shape").forEach(el=>el.classList.toggle("selected",el.dataset.shape===state.shape))}
-function renderShapes(){let div=$("shapes");div.innerHTML=shapes.map(([id,name])=>`<button class="shape ${id===state.shape?"selected":""}" data-shape="${id}"><span class="glyph" style="border-radius:${id.includes("soft")?"8px":id.includes("dot")?"50%":0};transform:${id==="diamond"?"rotate(45deg)":""}"></span>${name}</button>`).join("");$("shapeCount").textContent="("+shapes.length+")";div.onclick=e=>{let b=e.target.closest("[data-shape]");if(!b)return;push();state.shape=b.dataset.shape;selectShape();draw()}}
-function renderPresets(){ $("presets").innerHTML=presets.map(([name,fg,bg,shape])=>`<button class="preset" data-p="${name}"><strong>${name}</strong><span style="color:${fg};background:${bg};padding:3px 6px;border-radius:4px">● ◼</span></button>`).join("");$("presets").onclick=e=>{let b=e.target.closest("[data-p]");if(!b)return;let p=presets.find(x=>x[0]===b.dataset.p);push();if(lum(state.bg)<lum(state.fg)){state.fg=p[2];state.bg=blend(p[1],"#000000",.6)}else{state.fg=p[1];state.bg=p[2]}state.shape=p[3];sync();draw()}}
-function renderPalette(){let cols=["#111827","#ffffff","#0f766e","#7c3aed","#db2777","#f97316","#22c55e","#0284c7","#facc15","#e5e7eb","#0f172a","#9f1239","#155e75","#713f12","#334155","#e8edf6","#4de0c1","#8a7dff","#ff7979","#0d1117"]; $("palette").innerHTML=cols.map(c=>`<div class="swatch" style="background:${c}" data-c="${c}"></div>`).join("");$("palette").onclick=e=>{let b=e.target.closest("[data-c]");if(!b)return;push();state.fg=b.dataset.c;sync();draw()}}
-function exportSVG(){if(!matrix)return;if(bgImage){draw();let t=canvas.width;download(`<svg xmlns="http://www.w3.org/2000/svg" width="${t}" height="${t}" viewBox="0 0 ${t} ${t}"><image width="${t}" height="${t}" href="${canvas.toDataURL("image/png")}"/></svg>`,"mikro-qr.svg","image/svg+xml");return}let n=matrix.length,q=state.quiet,cell=8,total=(n+q*2)*cell;let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${total}" height="${total}" viewBox="0 0 ${total} ${total}"><rect width="100%" height="100%" fill="${state.bg}"/>`;for(let r=0;r<n;r++)for(let c=0;c<n;c++){if(!matrix[r][c]||isFinder(r,c,n))continue;let x=(q+c)*cell,y=(q+r)*cell;svg+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="${state.fg}"/>`}for(let [r,c] of [[0,0],[0,n-7],[n-7,0]]){let x=(q+c)*cell,y=(q+r)*cell,s=7*cell;svg+=`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${state.fg}"/><rect x="${x+cell}" y="${y+cell}" width="${s-2*cell}" height="${s-2*cell}" fill="${state.bg}"/><rect x="${x+2*cell}" y="${y+2*cell}" width="${s-4*cell}" height="${s-4*cell}" fill="${state.fg}"/>`}svg+="</svg>";download(svg,"mikro-qr.svg","image/svg+xml")}
-function download(data,name,type){let blob=new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
-function png(){draw();canvas.toBlob(b=>{let u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="mikro-qr.png";a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)})}
-function scan(){let a=lum(state.fg),b=lum(state.bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);let msg="Yerel görsel risk simülasyonu: "+(ratio<4?"Kontrast düşük ("+ratio.toFixed(1)+":1). ":"")+(bgImage&&state.imgDot<.5?"Nokta çok küçük, büyüt. ":"")+(bgImage&&state.imgMix<.3?"Desen gücü düşük, görsel baskın olabilir. ":"")+(a>b?"Ters (açık modül/koyu zemin) QR bazı eski tarayıcılarda okunmayabilir. ":"")+(state.gap>.12?"Modül aralığı yüksek; sadeleştir. ":"")+(state.fg==="#ffffff"?"Açık modül rengi riskli. ":"")+"Bu tasarım gerçek kamera ile test edilmedi."; $("scanResult").textContent=msg;setStatus("Simülasyon tamamlandı")}
-function syncControls(){for(let id of ["size","thick","gap","round","variation","fg","bgc","gradient","finderOuter","finderInner","finderScale","frame","quiet","ecc","imgMix","imgDot"])$(id).addEventListener("input",()=>{push();let key={bgc:"bg"}[id]||id;state[key]=$(id).value;if(id==="ecc"){makeMatrix();return}if(["size","thick","gap","round","variation","finderScale","quiet","imgMix","imgDot"].includes(id))state[key]=Number(state[key]);$("sizeVal").textContent=state.size;$("thickVal").textContent=state.thick;$("gapVal").textContent=state.gap;$("roundVal").textContent=state.round;$("mixVal").textContent=state.imgMix;$("dotVal").textContent=state.imgDot;draw()});$("payload").addEventListener("input",()=>{state.payload=$("payload").value;makeMatrix()});}
-$("themeQR").onclick=()=>{push();let t=state.fg;state.fg=state.bg;state.bg=t;state.dark=lum(state.bg)<lum(state.fg);$("themeQR").textContent=state.dark?"☀ Açık QR":"☾ Koyu QR";sync();draw()};
-$("test").onclick=scan;$("scan").onclick=scan;$("exportSvg").onclick=exportSVG;$("exportPng").onclick=png;$("save").onclick=()=>{localStorage.setItem("mikroQRproject",JSON.stringify(state));setStatus("Proje cihazda kaydedildi")};$("scanTab").onclick=scan;$("batchTab").onclick=()=>$("bgFile").click();$("savedTab").onclick=()=>{let s=localStorage.getItem("mikroQRproject");if(!s){alert("Henüz proje kaydedilmedi.");return}if(confirm("Kayıtlı proje yüklensin mi?")){push();Object.assign(state,JSON.parse(s));$("payload").value=state.payload;sync();makeMatrix()}};
-$("undo").onclick=()=>{if(history.length){future.push(snapshot());restore(history.pop())}};$("redo").onclick=()=>{if(future.length){history.push(snapshot());restore(future.pop())}};
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");tab=b.dataset.tab;let ids={module:"moduleSettings",finder:"finderSettings",color:"colorSettings",frame:"frameSettings"};Object.keys(ids).forEach(k=>$(ids[k]).style.opacity=k===tab?"1":".45")});
-initImage();renderShapes();renderPresets();renderPalette();syncControls();loadLib().then(()=>{makeMatrix();setStatus("QR hazır")}).catch(()=>setStatus("QR motoru yüklenemedi — lib klasöründeki dosyaları kontrol edin"));
-})();
-</script>
-<script>
-(function () {
-  const studioButton = document.getElementById('showStudio');
-  const placerButton = document.getElementById('showPlacer');
-  if (!studioButton || !placerButton) return;
-  function sendStyledQR() {
-    const frame = document.getElementById('placerFrame');
-    const qrCanvas = document.getElementById('qr');
-    if (!frame || !frame.contentWindow || !qrCanvas || !qrCanvas.width) return;
-    try {
-      frame.contentWindow.postMessage({
-        type: 'mikroqr:styled-qr',
-        dataUrl: qrCanvas.toDataURL('image/png')
-      }, window.location.origin);
-    } catch (err) { console.warn('Tasarlanmış QR aktarılamadı:', err); }
-  }
-  function setView(view) {
-    const placer = view === 'placer';
-    document.body.classList.toggle('placer-mode', placer);
-    document.title = placer
-      ? 'MikroQR — Görsel Yerleştirici'
-      : 'MikroQR — QR Tasarım ve Görsel Stüdyosu';
-    if (placer) {
-      const frame = document.getElementById('placerFrame');
-      if (frame) {
-        if (!frame.dataset.started) frame.dataset.started = 'true';
-        if (frame.contentWindow) sendStyledQR();
-      }
+function circ(cx, cy, r, ccw){
+  const s = ccw ? 0 : 1;
+  return `M${f2(cx - r)} ${f2(cy)}a${f2(r)} ${f2(r)} 0 1 ${s} ${f2(2 * r)} 0a${f2(r)} ${f2(r)} 0 1 ${s} ${f2(-2 * r)} 0Z`;
+}
+const poly = pts => 'M' + pts.map(p => f2(p[0]) + ' ' + f2(p[1])).join('L') + 'Z';
+function rotRect(cx, cy, L, T, deg){
+  const a = deg * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+  return poly([[-L/2,-T/2],[L/2,-T/2],[L/2,T/2],[-L/2,T/2]].map(([x, y]) => [cx + x * ca - y * sa, cy + x * sa + y * ca]));
+}
+function hash(r, c, s){
+  let h = (Math.imul(r + 1, 374761393) + Math.imul(c + 1, 668265263) + Math.imul(s | 0, 1274126177)) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+const NONE = {t:0,b:0,l:0,r:0};
+function modulePath(type, x, y, s, nb, o, rnd, rnd2){
+  if (type === 'mix') { const L = ['square','soft','circle','diamond','leaf','bevel']; type = L[Math.floor(rnd * L.length) % L.length]; }
+  let k = o.size * (1 - o.gap) * (1 - o.jit * rnd2);
+  if (type === 'mosaic') k *= .7 + .3 * rnd;
+  const w = s * k, ox = x + (s - w) / 2, oy = y + (s - w) / 2, cx = x + s / 2, cy = y + s / 2, r = w / 2, rd = o.round;
+  switch (type) {
+    case 'square': case 'mosaic': return rrect(ox, oy, w, w, rd * r);
+    case 'soft': return rrect(ox, oy, w, w, Math.max(rd, .64) * r);
+    case 'circle': return circ(cx, cy, r);
+    case 'ring': return circ(cx, cy, r) + circ(cx, cy, r * .52, true);
+    case 'frameSq': { const m = w * .27; return rrect(ox, oy, w, w, rd * r) + rectCCW(ox + m, oy + m, w - 2 * m, w - 2 * m); }
+    case 'diamond': return poly([[cx, oy],[ox + w, cy],[cx, oy + w],[ox, cy]]);
+    case 'hex': return poly([[cx, oy],[ox + w, oy + w * .25],[ox + w, oy + w * .75],[cx, oy + w],[ox, oy + w * .75],[ox, oy + w * .25]]);
+    case 'octagon': { const c = w * .29; return poly([[ox + c, oy],[ox + w - c, oy],[ox + w, oy + c],[ox + w, oy + w - c],[ox + w - c, oy + w],[ox + c, oy + w],[ox, oy + w - c],[ox, oy + c]]); }
+    case 'sparkle': { const i = r * .3; return poly([[cx, cy - r],[cx + i, cy - i],[cx + r, cy],[cx + i, cy + i],[cx, cy + r],[cx - i, cy + i],[cx - r, cy],[cx - i, cy - i]]); }
+    case 'plus': { const t = w * .36; return rect(ox + (w - t) / 2, oy, t, w) + rect(ox, oy + (w - t) / 2, w, t); }
+    case 'cross': return rotRect(cx, cy, w * 1.12, w * .34, 45) + rotRect(cx, cy, w * 1.12, w * .34, -45);
+    case 'leaf': return rrect(ox, oy, w, w, [r, 0, r, 0]);
+    case 'bevel': { const c = w * .3; return poly([[ox + c, oy],[ox + w, oy],[ox + w, oy + w - c],[ox + w - c, oy + w],[ox, oy + w],[ox, oy + c]]); }
+    case 'slant': return poly([[ox + w * .24, oy],[ox + w, oy],[ox + w * .76, oy + w],[ox, oy + w]]);
+    case 'liquid': {
+      const x0 = nb.l ? x : ox, x1 = nb.r ? x + s : ox + w, y0 = nb.t ? y : oy, y1 = nb.b ? y + s : oy + w;
+      return rrect(x0, y0, x1 - x0, y1 - y0, [(!nb.t && !nb.l) ? r : 0, (!nb.t && !nb.r) ? r : 0, (!nb.b && !nb.r) ? r : 0, (!nb.b && !nb.l) ? r : 0]);
+    }
+    case 'hBar': case 'hCap': {
+      const th = w * .76, er = type === 'hCap' ? th / 2 : rd * th / 2;
+      const x0 = nb.l ? x : ox, x1 = nb.r ? x + s : ox + w;
+      return rrect(x0, cy - th / 2, x1 - x0, th, [nb.l ? 0 : er, nb.r ? 0 : er, nb.r ? 0 : er, nb.l ? 0 : er]);
+    }
+    case 'vBar': case 'vCap': {
+      const th = w * .76, er = type === 'vCap' ? th / 2 : rd * th / 2;
+      const y0 = nb.t ? y : oy, y1 = nb.b ? y + s : oy + w;
+      return rrect(cx - th / 2, y0, th, y1 - y0, [nb.t ? 0 : er, nb.t ? 0 : er, nb.b ? 0 : er, nb.b ? 0 : er]);
     }
   }
-  const frame = document.getElementById('placerFrame');
-  if (frame) frame.addEventListener('load', function () {
-    if (document.body.classList.contains('placer-mode')) sendStyledQR();
+  return rrect(ox, oy, w, w, 0);
+}
+const inEye = (r, c, n) => (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7);
+
+function eyePath(x, y, c, outer, inner){
+  let d = '';
+  const O = 7 * c, H = 5 * c, I = 3 * c;
+  const fam = { square:[0,0,0], round:[1.5 * c, .5 * c, c], circle:[3.5 * c, 2.5 * c, 1.5 * c], leaf:null };
+  if (outer === 'leaf') d += rrect(x, y, O, O, [3 * c, 0, 3 * c, 0]) + rrect(x + c, y + c, H, H, [2 * c, 0, 2 * c, 0]);
+  else { const F = fam[outer]; d += rrect(x, y, O, O, F[0]) + rrect(x + c, y + c, H, H, F[1]); }
+  const ir = { square:0, round:c, circle:1.5 * c, leaf:[1.5 * c, 0, 1.5 * c, 0] }[inner];
+  d += rrect(x + 2 * c, y + 2 * c, I, I, ir);
+  return d;
+}
+function gradDef(id, st, W){
+  const stops = `<stop offset="0" stop-color="${st.fg}"/><stop offset="1" stop-color="${st.fg2}"/>`;
+  if (st.gradient === 'radial') return `<radialGradient id="${id}" gradientUnits="userSpaceOnUse" cx="${W / 2}" cy="${W / 2}" r="${f2(W * .72)}">${stops}</radialGradient>`;
+  const p = { horizontal:[0,0,W,0], vertical:[0,0,0,W], diagonal:[0,0,W,W] }[st.gradient];
+  return `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${p[0]}" y1="${p[1]}" x2="${p[2]}" y2="${p[3]}">${stops}</linearGradient>`;
+}
+function frameLabel(st){
+  if (st.frame === 'none') return '';
+  if (st.frame === 'custom') return (st.frameText || '').trim().toUpperCase();
+  return FRAME_TEXT[st.frame] || '';
+}
+
+/* st: tasarım durumu, M: modül matrisi, ex: {img:{href,lum}, quiet, noFrame, title} */
+function composeSvg(st, M, ex = {}){
+  const n = M.length, q = ex.quiet != null ? ex.quiet : st.quiet, C = 10, W = (n + 2 * q) * C, off = q * C;
+  const useImg = !!ex.img;
+  const label = ex.noFrame ? '' : frameLabel(st);
+  const bandH = label ? C * 5.6 : 0, padB = label ? C * 1.4 : 0, H = W + bandH + padB;
+  const gid = 'mq' + (++uid);
+  let defs = '', fill = st.fg, out = '';
+  if (!useImg && st.gradient !== 'none') { defs += gradDef(gid, st, W); fill = `url(#${gid})`; }
+  const eyeFill = st.eyeSame ? fill : st.eyeColor;
+  if (!(st.transparent && !useImg)) out += `<rect width="${W}" height="${H}" fill="${st.bg}"/>`;
+  const dark = (r, c) => r >= 0 && c >= 0 && r < n && c < n && M[r][c] && !inEye(r, c, n);
+
+  if (!useImg) {
+    const op = { size: st.size, gap: st.gap, round: st.round, jit: st.variation };
+    let d = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      if (!dark(r, c)) continue;
+      const nb = { t: dark(r - 1, c), b: dark(r + 1, c), l: dark(r, c - 1), r: dark(r, c + 1) };
+      d += modulePath(st.shape, off + c * C, off + r * C, C, nb, op, hash(r, c, st.seed), hash(c, r, st.seed + 11));
+    }
+    out += `<path d="${d}" fill="${fill}"/>`;
+  } else {
+    defs += `<clipPath id="${gid}c"><rect width="${W}" height="${W}"/></clipPath>`;
+    out += `<image href="${ex.img.href}" width="${W}" height="${W}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${gid}c)"/>`;
+    out += `<g fill="${st.bg}" fill-opacity=".88"><rect width="${W}" height="${off}"/><rect y="${W - off}" width="${W}" height="${off}"/><rect y="${off}" width="${off}" height="${W - 2 * off}"/><rect x="${W - off}" y="${off}" width="${off}" height="${W - 2 * off}"/></g>`;
+    const Lf = lum(st.fg), Lb = lum(st.bg), tint = {}, op = { size: st.imgDot, gap: 0, round: Math.max(st.round, .3), jit: 0 };
+    let dd = '', dl = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      if (inEye(r, c, n)) continue;
+      const x = off + c * C, y = off + r * C, dk = !!M[r][c], Lt = dk ? Lf : Lb, Lp = ex.img.lum[r][c];
+      const a = Math.min(.95, Math.max(0, st.imgMix * (.6 + 1.6 * Math.abs(Lt - Lp))));
+      const key = (dk ? 1 : 0) + ':' + Math.round(a / .05);
+      tint[key] = (tint[key] || '') + rect(x, y, C, C);
+      const dp = modulePath(st.shape, x, y, C, NONE, op, hash(r, c, st.seed), hash(c, r, st.seed + 11));
+      if (dk) dd += dp; else dl += dp;
+    }
+    for (const key of Object.keys(tint)) {
+      const [dk, b] = key.split(':');
+      out += `<path d="${tint[key]}" fill="${dk === '1' ? st.fg : st.bg}" fill-opacity="${f2(b * .05)}"/>`;
+    }
+    out += `<path d="${dd}" fill="${st.fg}"/><path d="${dl}" fill="${st.bg}"/>`;
+    for (const [pr, pc] of [[0,0],[0,n - 8],[n - 8,0]]) out += `<rect x="${off + pc * C}" y="${off + pr * C}" width="${8 * C}" height="${8 * C}" fill="${st.bg}"/>`;
+  }
+  /* Gözler */
+  const cE = C * st.finderScale, inset = (7 * C - 7 * cE) / 2;
+  let ed = '';
+  for (const [r, c] of [[0,0],[0,n - 7],[n - 7,0]]) ed += eyePath(off + c * C + inset, off + r * C + inset, cE, st.finderOuter, st.finderInner);
+  out += `<path d="${ed}" fill="${useImg ? st.fg : eyeFill}" fill-rule="evenodd"/>`;
+
+  /* Çerçeve */
+  if (label) {
+    const solid = st.fg, fs0 = C * 2.5, maxW = W - C * 6;
+    const fs = Math.min(fs0, maxW / (label.length * .68));
+    const ty = W + bandH / 2 + fs * .35;
+    const font = `font-family="Helvetica Neue,Helvetica,Arial,system-ui,sans-serif" font-weight="700" font-size="${f2(fs)}" letter-spacing="${f2(fs * .08)}" text-anchor="middle"`;
+    if (st.frameStyle === 'outline') {
+      out += `<rect x="${C * .35}" y="${C * .35}" width="${W - C * .7}" height="${H - C * .7}" rx="${C * 2.2}" fill="none" stroke="${solid}" stroke-width="${C * .7}"/>`;
+      out += `<text x="${W / 2}" y="${f2(ty)}" fill="${solid}" ${font}>${xml(label)}</text>`;
+    } else {
+      const tc = (!st.transparent && contrast(st.bg, solid) >= 3) ? st.bg : (lum(solid) > .4 ? '#000000' : '#ffffff');
+      out += `<rect x="${C * 1.2}" y="${W}" width="${W - C * 2.4}" height="${bandH}" rx="${C * 1.6}" fill="${solid}"/>`;
+      out += `<text x="${W / 2}" y="${f2(ty)}" fill="${tc}" ${font}>${xml(label)}</text>`;
+    }
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="QR kod" shape-rendering="geometricPrecision">${ex.title ? `<title>${xml(ex.title)}</title>` : ''}${defs ? `<defs>${defs}</defs>` : ''}${out}</svg>`;
+  return { svg, W, H };
+}
+
+/* ---------- Matris ---------- */
+function makeMatrix(){
+  const text = buildPayload(state);
+  errorMsg = '';
+  if (!window.qrcode) { matrix = null; errorMsg = 'QR motoru yüklenemedi. lib klasörünün yerinde olduğundan emin ol.'; return; }
+  if (!text) { matrix = null; return; }
+  try {
+    const q = window.qrcode(0, state.ecc);
+    q.addData(text, 'Byte'); q.make();
+    const n = q.getModuleCount();
+    matrix = Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => q.isDark(r, c)));
+  } catch (e) {
+    matrix = null; errorMsg = 'İçerik bu hata düzeltme seviyesine sığmıyor. Metni kısalt ya da seviyeyi düşür.';
+  }
+}
+const sampleMatrix = (() => {
+  try { const q = window.qrcode(0, 'L'); q.addData('MikroQR', 'Byte'); q.make(); const n = q.getModuleCount(); return Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => q.isDark(r, c))); } catch (e) { return null; }
+})();
+
+/* ---------- Görsel modu ---------- */
+function lumGrid(n, q){
+  const key = n + ':' + q;
+  if (img.lumKey === key) return img.lum;
+  const S = (n + 2 * q) * 6, c = document.createElement('canvas'); c.width = c.height = S;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  const sc = Math.max(S / img.w, S / img.h), dw = img.w * sc, dh = img.h * sc;
+  g.drawImage(img.el, (S - dw) / 2, (S - dh) / 2, dw, dh);
+  let d; try { d = g.getImageData(0, 0, S, S).data; } catch (e) { d = null; }
+  const L = [];
+  for (let r = 0; r < n; r++) { const row = []; for (let cc = 0; cc < n; cc++) {
+    let sum = 0, cnt = 0;
+    if (d) for (let yy = (q + r) * 6; yy < (q + r + 1) * 6; yy++) for (let xx = (q + cc) * 6; xx < (q + cc + 1) * 6; xx++) { const i = (yy * S + xx) * 4; sum += (.2126 * d[i] + .7152 * d[i + 1] + .0722 * d[i + 2]) / 255; cnt++; }
+    row.push(cnt ? sum / cnt : .5);
+  } L.push(row); }
+  img.lumKey = key; img.lum = L; return L;
+}
+function imgDataUrl(max = 1400){
+  const S = Math.min(max, Math.max(img.w, img.h)), c = document.createElement('canvas'); c.width = c.height = S;
+  const g = c.getContext('2d'), sc = Math.max(S / img.w, S / img.h);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, S, S);
+  g.drawImage(img.el, (S - img.w * sc) / 2, (S - img.h * sc) / 2, img.w * sc, img.h * sc);
+  return c.toDataURL('image/jpeg', .9);
+}
+function currentSvg(opts = {}){
+  if (!matrix) return null;
+  const ex = { title: opts.title };
+  if (img) { ex.img = { href: opts.embed ? imgDataUrl(opts.imgMax || 1400) : img.url, lum: lumGrid(matrix.length, state.quiet) }; }
+  return composeSvg(state, matrix, ex);
+}
+function setImageEl(el, url, name){
+  if (img && img.url && img.url.startsWith('blob:')) URL.revokeObjectURL(img.url);
+  img = { el, url, w: el.naturalWidth || el.width, h: el.naturalHeight || el.height, lum: null, lumKey: '', name };
+  commit('image'); state.ecc = 'H';
+  makeMatrix(); syncUI(); render();
+  toast('Görsel eklendi, hata düzeltme H yapıldı');
+}
+function loadFile(file){
+  if (!file || !file.type.startsWith('image/')) { toast('Bu dosya bir görsel değil'); return; }
+  const url = URL.createObjectURL(file), el = new Image();
+  el.onload = () => setImageEl(el, url, file.name);
+  el.onerror = () => { URL.revokeObjectURL(url); toast('Görsel açılamadı'); };
+  el.src = url;
+}
+function loadCanvas(cv, name){
+  cv.toBlob(b => { const url = URL.createObjectURL(b), el = new Image(); el.onload = () => setImageEl(el, url, name); el.src = url; }, 'image/png');
+}
+function clearImage(){
+  if (!img) return;
+  if (img.url.startsWith('blob:')) URL.revokeObjectURL(img.url);
+  img = null; syncUI(); render(); toast('Görsel kaldırıldı');
+}
+const mk = () => { const c = document.createElement('canvas'); c.width = c.height = 900; return c; };
+const SAMPLES = {
+  'Aurora': () => { const c = mk(), g = c.getContext('2d'); g.fillStyle = '#0a1020'; g.fillRect(0, 0, 900, 900); [[200,250,'#22d3ee'],[650,200,'#8b5cf6'],[450,650,'#10b981'],[780,720,'#ec4899'],[120,760,'#3b82f6']].forEach(([x, y, col]) => { const r = g.createRadialGradient(x, y, 0, x, y, 430); r.addColorStop(0, col + 'dd'); r.addColorStop(1, col + '00'); g.fillStyle = r; g.fillRect(0, 0, 900, 900); }); return c; },
+  'Gün batımı': () => { const c = mk(), g = c.getContext('2d'), l = g.createLinearGradient(0, 0, 0, 900); l.addColorStop(0, '#1e1b4b'); l.addColorStop(.5, '#c2410c'); l.addColorStop(1, '#fbbf24'); g.fillStyle = l; g.fillRect(0, 0, 900, 900); g.fillStyle = '#fde68a'; g.beginPath(); g.arc(450, 520, 170, 0, 7); g.fill(); [['#7c2d12',640],['#431407',730],['#1c0a05',820]].forEach(([col, y], i) => { g.fillStyle = col; g.beginPath(); g.moveTo(0, 900); for (let x = 0; x <= 900; x += 30) g.lineTo(x, y + Math.sin(x * .012 + i * 2) * 45 + Math.sin(x * .03 + i) * 18); g.lineTo(900, 900); g.fill(); }); return c; },
+  'Topografik': () => { const c = mk(), g = c.getContext('2d'); g.fillStyle = '#0f2a2a'; g.fillRect(0, 0, 900, 900); g.lineWidth = 3; for (let i = 0; i < 45; i++) { g.strokeStyle = 'hsl(' + (150 + i * 2) + ',55%,' + (35 + i % 5 * 6) + '%)'; g.beginPath(); for (let x = 0; x <= 900; x += 10) { const y = i * 21 + Math.sin(x * .011 + i * .45) * 55 + Math.sin(x * .027 + i * .2) * 22; x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } return c; },
+  'Kozmik': () => { const c = mk(), g = c.getContext('2d'); let s = 7; const R = () => (s = s * 16807 % 2147483647) / 2147483647; g.fillStyle = '#05060f'; g.fillRect(0, 0, 900, 900); [[300,300,'#6d28d9'],[620,560,'#0e7490'],[760,180,'#be185d']].forEach(([x, y, col]) => { const r = g.createRadialGradient(x, y, 0, x, y, 360); r.addColorStop(0, col + '99'); r.addColorStop(1, col + '00'); g.fillStyle = r; g.fillRect(0, 0, 900, 900); }); for (let i = 0; i < 420; i++) { g.globalAlpha = .3 + R() * .7; g.fillStyle = '#fff'; g.beginPath(); g.arc(R() * 900, R() * 900, R() * 2.2 + .4, 0, 7); g.fill(); } g.globalAlpha = 1; return c; }
+};
+
+/* ---------- Geçmiş ---------- */
+let hist = [], fut = [], last = { k: null, t: 0 };
+function commit(k){
+  const now = Date.now();
+  if (k && last.k === k && now - last.t < 900) { last.t = now; return; }
+  last = { k, t: now };
+  hist.push(JSON.stringify(state)); if (hist.length > 60) hist.shift(); fut = [];
+  updateUndo();
+}
+function updateUndo(){ $('undo').disabled = !hist.length; $('redo').disabled = !fut.length; }
+function undo(){ if (!hist.length) return; fut.push(JSON.stringify(state)); state = normalize(JSON.parse(hist.pop())); last = { k: null, t: 0 }; afterRestore(); }
+function redo(){ if (!fut.length) return; hist.push(JSON.stringify(state)); state = normalize(JSON.parse(fut.pop())); last = { k: null, t: 0 }; afterRestore(); }
+function afterRestore(){ makeMatrix(); syncUI(); render(); updateUndo(); }
+
+/* ---------- Bildirim ---------- */
+let toastT;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---------- Önizleme ---------- */
+let raf = 0;
+function render(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; paint(); }); }
+function paint(){
+  const sheet = $('sheet');
+  const res = currentSvg();
+  if (!res) {
+    sheet.className = 'qr-sheet'; sheet.style.background = 'transparent'; sheet.style.boxShadow = 'none';
+    sheet.innerHTML = `<div class="empty">${icon('qr')}<div>${xml(errorMsg || 'QR oluşturmak için içerik gir.')}</div></div>`;
+    $('meta').innerHTML = ''; setStatus(errorMsg ? 'Üretilemedi' : 'İçerik bekleniyor');
+    renderChecks(); scheduleSave(); return;
+  }
+  sheet.style.background = ''; sheet.style.boxShadow = '';
+  sheet.className = 'qr-sheet' + (state.transparent && !img ? ' is-transparent' : '');
+  sheet.innerHTML = res.svg;
+  const n = matrix.length, bytes = new TextEncoder().encode(buildPayload(state)).length;
+  $('meta').innerHTML = `<span class="chip">Sürüm ${(n - 17) / 4}</span><span class="chip">${n}×${n} modül</span><span class="chip">${bytes} / ${MAX_BYTES[state.ecc]} bayt</span>`;
+  setStatus('');
+  renderChecks(); scheduleSave(); scheduleVerify();
+  const ph = $('previewCard').offsetHeight; document.documentElement.style.setProperty('--prev-h', (ph + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh')) || 56)) + 'px');
+}
+function setStatus(t){ $('status').textContent = t; }
+
+/* ---------- Okunabilirlik ---------- */
+const SHAPE_RISK = Object.fromEntries(SHAPES.map(s => [s[0], s[2]]));
+const SHAPE_NAME = Object.fromEntries(SHAPES.map(s => [s[0], s[1]]));
+let verifyState = { kind: 'idle', msg: '' };
+function analyze(){
+  const items = [], st = state;
+  const bgEff = st.bg;
+  const c1 = contrast(st.fg, bgEff);
+  if (st.transparent && !img) items.push(['warn', 'Saydam zemin: okunabilirlik, QR\'ın üzerine yerleşeceği yüzeye bağlı.']);
+  else if (c1 < 3) items.push(['bad', `Kontrast çok düşük (${c1.toFixed(1)}:1). Koyu modül ve açık zemin kullan.`]);
+  else if (c1 < 4.5) items.push(['warn', `Kontrast sınırda (${c1.toFixed(1)}:1). Daha koyu bir modül rengi seç.`]);
+  else items.push(['ok', `Kontrast yeterli (${c1.toFixed(1)}:1).`]);
+  if (st.gradient !== 'none' && !img) {
+    const c2 = contrast(st.fg2, bgEff);
+    if (c2 < 3) items.push(['warn', `Geçişin bitiş rengi zeminle düşük kontrastta (${c2.toFixed(1)}:1).`]);
+  }
+  if (lum(st.fg) > lum(st.bg) && !(st.transparent && !img)) items.push(['warn', 'Açık modül / koyu zemin: bazı tarayıcılar ters renkli kodu okuyamaz.']);
+  if (st.quiet < 4) items.push(['warn', `Sessiz bölge ${st.quiet} modül. Standart en az 4 modüldür.`]);
+  const risk = SHAPE_RISK[st.shape];
+  if (risk === 'h') items.push(['warn', `"${SHAPE_NAME[st.shape]}" biçimi okunabilirliği düşürebilir. Hata düzeltmeyi Q veya H yap.`]);
+  else if (risk === 'm' && (st.ecc === 'L' || st.ecc === 'M')) items.push(['warn', `"${SHAPE_NAME[st.shape]}" için hata düzeltmeyi Q veya H yapman önerilir.`]);
+  if (!img && (st.size < .75 || st.gap > .12)) items.push(['warn', 'Küçük modül boyutu ya da geniş aralık taramayı zorlaştırabilir.']);
+  if (st.finderOuter === 'circle') items.push(['warn', 'Daire biçimli dış göz bazı okuyucularda algılanmayabilir. Kare, Yumuşak ya da Yaprak daha güvenlidir.']);
+  if (st.finderScale < .9) items.push(['warn', 'Küçültülmüş göz alanları algılamayı zorlaştırabilir.']);
+  if (img) {
+    if (st.ecc !== 'H') items.push(['warn', 'Görsel modunda hata düzeltme H önerilir.']);
+    if (st.imgDot < .5) items.push(['warn', 'Noktalar küçük; boyutu artır.']);
+    if (st.imgMix < .3) items.push(['warn', 'Desen gücü düşük; görsel kodu bastırabilir.']);
+  }
+  if (!items.some(i => i[0] !== 'ok')) items.push(['ok', 'Gözler ve sessiz bölge korunuyor.']);
+  const lvl = items.some(i => i[0] === 'bad') ? 'bad' : items.some(i => i[0] === 'warn') ? 'warn' : 'ok';
+  return { items, lvl };
+}
+function renderChecks(){
+  const a = analyze(), ic = { ok:'check', warn:'alert', bad:'x-circle', idle:'info' };
+  let html = a.items.map(([l, t]) => `<li class="${l}">${icon(ic[l])}<span>${xml(t)}</span></li>`).join('');
+  if (verifyState.kind !== 'idle') html = `<li class="${verifyState.kind}">${icon(ic[verifyState.kind])}<span>${xml(verifyState.msg)}</span></li><hr>` + html;
+  $('checks').innerHTML = html;
+  const txt = { ok:'İyi', warn:'Dikkat', bad:'Riskli' }[a.lvl];
+  for (const id of ['healthChip', 'healthChip2']) { const e = $(id); e.className = 'chip ' + a.lvl; e.innerHTML = icon(a.lvl === 'ok' ? 'check' : 'alert') + txt; }
+  const vc = $('verifyChip');
+  if (verifyState.kind === 'ok') { vc.hidden = false; vc.className = 'chip ok'; vc.innerHTML = icon('scan') + 'Okunuyor'; }
+  else if (verifyState.kind === 'bad') { vc.hidden = false; vc.className = 'chip bad'; vc.innerHTML = icon('scan') + 'Okunamadı'; }
+  else vc.hidden = true;
+}
+
+/* ---------- Dışa aktarma ---------- */
+function svgToCanvas(svg, W, H, px){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })), im = new Image();
+    im.onload = () => {
+      const c = document.createElement('canvas'); c.width = px; c.height = Math.round(px * H / W);
+      const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c);
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('raster')); };
+    im.src = url;
   });
-  window.addEventListener('message', function (event) {
-    if (event.origin !== window.location.origin || !event.data || event.data.type !== 'mikroqr:back-to-studio') return;
-    setView('studio');
+}
+const toBlob = (c, type = 'image/png') => new Promise(r => c.toBlob(r, type));
+async function pngBlob(px){
+  const r = currentSvg({ embed: true, title: 'MikroQR' }); if (!r) return null;
+  return toBlob(await svgToCanvas(r.svg, r.W, r.H, px));
+}
+function saveBlob(blob, name){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+const xp = { fmt: ls.get('mikroqr-xfmt') || 'png', size: ls.get('mikroqr-xsize') || '1024' };
+async function doDownload(){
+  if (!matrix) return toast('Önce QR içeriği gir');
+  try {
+    if (xp.fmt === 'svg') { const r = currentSvg({ embed: true, title: 'MikroQR' }); saveBlob(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + r.svg], { type: 'image/svg+xml' }), 'mikroqr.svg'); toast('SVG indirildi'); }
+    else { const b = await pngBlob(+xp.size); saveBlob(b, 'mikroqr.png'); toast('PNG indirildi'); }
+    closeMenu();
+  } catch (e) { toast('Dışa aktarılamadı'); }
+}
+async function doCopy(){
+  if (!matrix) return toast('Önce QR içeriği gir');
+  try {
+    if (!navigator.clipboard || !window.ClipboardItem) throw 0;
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob(+xp.size) })]);
+    toast('Görsel panoya kopyalandı'); closeMenu();
+  } catch (e) { toast('Bu tarayıcı panoya görsel kopyalamayı desteklemiyor'); }
+}
+async function doShare(){
+  if (!matrix) return;
+  try {
+    const f = new File([await pngBlob(+xp.size)], 'mikroqr.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'MikroQR' }); closeMenu(); }
+    else toast('Paylaşım desteklenmiyor');
+  } catch (e) { /* kullanıcı vazgeçti */ }
+}
+
+/* ---------- Gerçek tarama testi ---------- */
+let vTimer = 0, vSeq = 0;
+const canDetect = 'BarcodeDetector' in window;
+function scheduleVerify(){ if (!canDetect) return; clearTimeout(vTimer); vTimer = setTimeout(() => verify(true), 700); }
+async function verify(silent){
+  if (!matrix) return;
+  if (!canDetect) { verifyState = { kind: 'idle', msg: '' }; $('verifyNote').textContent = 'Bu tarayıcı yerleşik QR okuyucu sunmuyor. Telefon kameranla ekrandan dene.'; if (!silent) toast('Bu tarayıcıda otomatik test yok'); return; }
+  const my = ++vSeq;
+  try {
+    const r = currentSvg({ embed: true, imgMax: 900 }), c = await svgToCanvas(r.svg, r.W, r.H, 700);
+    const res = await new BarcodeDetector({ formats: ['qr_code'] }).detect(c);
+    if (my !== vSeq) return;
+    const want = buildPayload(state);
+    if (!res.length) verifyState = { kind: 'bad', msg: 'Tarama testi: kod okunamadı. Kontrastı artır, biçimi sadeleştir.' };
+    else if (res[0].rawValue !== want) verifyState = { kind: 'bad', msg: 'Tarama testi: kod okundu ama içerik farklı çıktı.' };
+    else verifyState = { kind: 'ok', msg: 'Tarama testi geçti: kod okunuyor ve içerik doğru.' };
+    $('verifyNote').textContent = 'Test, bu tarayıcının yerleşik okuyucusuyla yapılır. Basmadan önce telefonla da dene.';
+    renderChecks(); if (!silent) toast(verifyState.kind === 'ok' ? 'Tarama testi geçti' : 'Kod okunamadı');
+  } catch (e) { if (!silent) toast('Test çalıştırılamadı'); }
+}
+
+/* ---------- Kayıtlar ---------- */
+const PK = 'mikroQR:projects';
+let projects = [];
+function loadProjects(){
+  try { projects = JSON.parse(ls.get(PK) || '[]'); } catch (e) { projects = []; }
+  if (!Array.isArray(projects)) projects = [];
+  const old = ls.get('mikroQRproject');
+  if (old && !projects.some(p => p.legacy)) {
+    try { projects.push({ id: 'legacy', legacy: true, name: 'Önceki kayıt', t: Date.now(), s: JSON.parse(old) }); persistProjects(); } catch (e) {}
+  }
+}
+const persistProjects = () => ls.set(PK, JSON.stringify(projects));
+function saveProject(){
+  const name = $('saveName').value.trim() || ('Tasarım ' + (projects.length + 1));
+  const s = JSON.parse(JSON.stringify(state));
+  projects.unshift({ id: 'p' + Date.now().toString(36), name, t: Date.now(), s });
+  projects = projects.slice(0, 30);
+  if (!persistProjects()) toast('Kayıt başarısız: tarayıcı depolaması dolu'); else toast('Tasarım kaydedildi');
+  $('saveName').value = ''; renderProjects();
+}
+function renderProjects(){
+  const ul = $('savedList'); ul.innerHTML = '';
+  $('savedEmpty').hidden = projects.length > 0;
+  for (const p of projects) {
+    const st = normalize(p.s); let th = '';
+    try {
+      const q = window.qrcode(0, st.ecc); q.addData(buildPayload(st) || 'MikroQR', 'Byte'); q.make();
+      const n = q.getModuleCount(), M = Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => q.isDark(r, c)));
+      th = composeSvg(st, M, { quiet: 1, noFrame: true }).svg;
+    } catch (e) {}
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="th">${th}</div><div style="min-width:0"><div class="nm"></div><div class="dt"></div></div><div class="act"><button class="btn sm" type="button" data-a="load">Aç</button><button class="btn icon sm ghost danger" type="button" data-a="del" aria-label="Sil">${icon('trash')}</button></div>`;
+    li.querySelector('.nm').textContent = p.name;
+    li.querySelector('.dt').textContent = new Date(p.t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+    li.querySelector('[data-a=load]').onclick = () => { commit(); state = normalize(p.s); afterRestore(); toast('Tasarım yüklendi'); };
+    li.querySelector('[data-a=del]').onclick = () => { projects = projects.filter(x => x.id !== p.id); persistProjects(); renderProjects(); };
+    ul.appendChild(li);
+  }
+}
+let saveT = 0;
+function scheduleSave(){ clearTimeout(saveT); saveT = setTimeout(() => ls.set('mikroQR:autosave', JSON.stringify(state)), 400); }
+
+/* ---------- Arayüz kurulumu ---------- */
+function shapeThumb(id){
+  const PAT = [[1,1,0,1],[1,1,1,1],[0,1,1,0],[1,0,1,1]], dk = (r, c) => !!(PAT[r] && PAT[r][c]);
+  const conn = ['liquid','hBar','vBar','hCap','vCap'].includes(id);
+  let d = '';
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+    if (!dk(r, c)) continue;
+    d += modulePath(id, c * 10, r * 10, 10, { t: dk(r - 1, c), b: dk(r + 1, c), l: dk(r, c - 1), r: dk(r, c + 1) }, { size: conn ? 1 : .88, gap: 0, round: 0, jit: 0 }, hash(r, c, 3), hash(c, r, 14));
+  }
+  return `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`;
+}
+function eyeThumb(outer, inner){
+  return `<svg viewBox="-2 -2 74 74" aria-hidden="true"><path d="${eyePath(0, 0, 10, outer, inner)}" fill="currentColor" fill-rule="evenodd"/></svg>`;
+}
+function buildTiles(){
+  $('shapes').innerHTML = SHAPES.map(([id, name, risk]) => `<button class="tile" type="button" data-shape="${id}" aria-pressed="false" title="${name}">${shapeThumb(id)}<span>${name}</span></button>`).join('');
+  $('shapeCount').textContent = '(' + SHAPES.length + ')';
+  $('eyeOuter').innerHTML = EYE_OUTER.map(([id, n]) => `<button class="tile" type="button" data-eo="${id}" aria-pressed="false">${eyeThumb(id, 'square')}<span>${n}</span></button>`).join('');
+  $('eyeInner').innerHTML = EYE_INNER.map(([id, n]) => `<button class="tile" type="button" data-ei="${id}" aria-pressed="false">${eyeThumb('square', id)}<span>${n}</span></button>`).join('');
+  if (sampleMatrix) $('presets').innerHTML = PRESETS.map(([name, p]) => {
+    const st = normalize(Object.assign({}, p, { quiet: 1 }));
+    return `<button class="tile preset" type="button" data-preset="${name}" aria-label="${name} şablonu">${composeSvg(st, sampleMatrix, { quiet: 2, noFrame: true }).svg}<span>${name}</span></button>`;
+  }).join('');
+  $('palette').innerHTML = PALETTE.map(([n, a, b]) => `<button class="pal" type="button" style="--a:${a};--b:${b}" data-pal="${a}|${b}" aria-label="${n}" title="${n}" aria-pressed="false"></button>`).join('');
+  $('frames').innerHTML = FRAMES.map(([id, n]) => `<button class="tile" type="button" data-frame="${id}" aria-pressed="false" style="padding:12px 4px;font-weight:600;font-size:12px">${n}</button>`).join('');
+  $('samples').innerHTML = Object.keys(SAMPLES).map(k => { const c = document.createElement('canvas'); c.width = c.height = 120; c.getContext('2d').drawImage(SAMPLES[k](), 0, 0, 120, 120); return `<button type="button" data-sample="${k}" aria-label="${k} arka planı"><img alt="" src="${c.toDataURL('image/jpeg', .7)}"><span>${k}</span></button>`; }).join('');
+}
+function syncUI(){
+  const st = state;
+  $$('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    if (el.type === 'checkbox') el.checked = !!st[k]; else el.value = st[k];
+    if (el.type === 'range') { const [a, b] = [+el.min, +el.max]; el.style.setProperty('--p', ((st[k] - a) / (b - a) * 100) + '%'); }
   });
-  placerButton.addEventListener('click', function () { setView('placer'); });
-  studioButton.addEventListener('click', function () { setView('studio'); });
-  if (window.location.hash === '#yerlestirici') setView('placer');
+  $$('[data-o]').forEach(o => { o.textContent = FMT[o.dataset.o](st[o.dataset.o]); });
+  $$('[data-hex]').forEach(el => { if (document.activeElement !== el) el.value = st[el.dataset.hex]; });
+  $$('[data-cf]').forEach(el => { const v = st.cf[el.dataset.cf]; if (el.type === 'checkbox') el.checked = !!v; else if (document.activeElement !== el) el.value = v; });
+  if (document.activeElement !== $('payload')) $('payload').value = st.payload;
+  if (document.activeElement !== $('frameText')) $('frameText').value = st.frameText;
+  const segs = { ctype: st.ctype, ecc: st.ecc, gradient: st.gradient, frameStyle: st.frameStyle, xfmt: xp.fmt, xsize: xp.size };
+  $$('[data-seg]').forEach(s => $$('button', s).forEach(b => b.setAttribute('aria-checked', String(b.dataset.v === String(segs[s.dataset.seg])))));
+  $$('[data-for]').forEach(e => { e.hidden = e.dataset.for !== st.ctype; });
+  $('eccInfo').textContent = ECC_INFO[st.ecc];
+  $$('[data-shape]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.shape === st.shape)));
+  $$('[data-eo]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.eo === st.finderOuter)));
+  $$('[data-ei]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ei === st.finderInner)));
+  $$('[data-frame]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.frame === st.frame)));
+  $$('[data-pal]').forEach(b => { const [a, c] = b.dataset.pal.split('|'); b.setAttribute('aria-pressed', String(a === st.fg && c === st.bg)); });
+  $('eyeColorField').hidden = st.eyeSame;
+  $('fg2Field').hidden = st.gradient === 'none';
+  $('frameTextField').hidden = st.frame !== 'custom';
+  $('frameStyleField').hidden = st.frame === 'none';
+  $('imgControls').hidden = !img; $('imgNote').hidden = !img;
+  $('xsizeField').hidden = xp.fmt === 'svg';
+  const urlLike = st.ctype === 'text' && /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(st.payload.trim());
+  $('urlHint').hidden = !urlLike;
+  updateUndo();
+}
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  ls.set('mikroqr-theme', t);
+  $('themeUse').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon');
+  const m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', t === 'dark' ? '#000000' : '#f5f5f7');
+  const fr = $('placerFrame'); if (fr && fr.contentWindow) fr.contentWindow.postMessage({ type: 'mikroqr:theme', theme: t }, '*');
+}
+function applyPreset(p){
+  commit();
+  const base = JSON.parse(JSON.stringify(DEF));
+  for (const k of DESIGN_KEYS) state[k] = base[k];
+  Object.assign(state, normalize(Object.assign({}, p)) && pick(normalize(p), Object.keys(p)));
+  if (!p.eyeColor) state.eyeColor = state.fg;
+  syncUI(); render();
+}
+const pick = (o, ks) => Object.fromEntries(ks.map(k => [k, o[k]]));
+function wire(){
+  /* Genel veri bağlama */
+  $$('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    el.addEventListener('input', () => {
+      commit(k);
+      if (el.type === 'checkbox') state[k] = el.checked;
+      else if (el.type === 'range') state[k] = k === 'quiet' ? Math.round(+el.value) : +el.value;
+      else state[k] = normHex(el.value, state[k]);
+      if (k === 'fg' && state.eyeSame) state.eyeColor = state.fg;
+      syncUI(); render();
+    });
+  });
+  $$('[data-hex]').forEach(el => {
+    el.addEventListener('change', () => { const k = el.dataset.hex, v = normHex(el.value, null); if (v) { commit(k); state[k] = v; } el.value = state[k]; syncUI(); render(); });
+  });
+  $$('[data-seg]').forEach(s => s.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const k = s.dataset.seg, v = b.dataset.v;
+    if (k === 'xfmt') { xp.fmt = v; ls.set('mikroqr-xfmt', v); syncUI(); return; }
+    if (k === 'xsize') { xp.size = v; ls.set('mikroqr-xsize', v); syncUI(); return; }
+    commit(k); state[k] = v;
+    if (k === 'ctype' || k === 'ecc') makeMatrix();
+    syncUI(); render();
+  }));
+  $$('[data-cf]').forEach(el => {
+    const ev = el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'input';
+    el.addEventListener(ev, () => { commit('cf'); state.cf[el.dataset.cf] = el.type === 'checkbox' ? el.checked : el.value; makeMatrix(); syncUI(); render(); });
+  });
+  $('payload').addEventListener('input', e => { commit('payload'); state.payload = e.target.value; makeMatrix(); syncUI(); render(); });
+  $('frameText').addEventListener('input', e => { commit('frameText'); state.frameText = e.target.value; render(); });
+
+  $('shapes').addEventListener('click', e => { const b = e.target.closest('[data-shape]'); if (!b) return; commit(); state.shape = b.dataset.shape; syncUI(); render(); });
+  $('eyeOuter').addEventListener('click', e => { const b = e.target.closest('[data-eo]'); if (!b) return; commit(); state.finderOuter = b.dataset.eo; syncUI(); render(); });
+  $('eyeInner').addEventListener('click', e => { const b = e.target.closest('[data-ei]'); if (!b) return; commit(); state.finderInner = b.dataset.ei; syncUI(); render(); });
+  $('frames').addEventListener('click', e => { const b = e.target.closest('[data-frame]'); if (!b) return; commit(); state.frame = b.dataset.frame; syncUI(); render(); });
+  $('presets').addEventListener('click', e => { const b = e.target.closest('[data-preset]'); if (!b) return; applyPreset(PRESETS.find(p => p[0] === b.dataset.preset)[1]); toast(b.dataset.preset + ' şablonu uygulandı'); });
+  $('palette').addEventListener('click', e => { const b = e.target.closest('[data-pal]'); if (!b) return; commit(); const [a, c] = b.dataset.pal.split('|'); state.fg = a; state.bg = c; if (state.eyeSame) state.eyeColor = a; syncUI(); render(); });
+  $('reseed').addEventListener('click', () => { commit(); state.seed = (state.seed * 7 + 13) % 9973; render(); });
+  $('samples').addEventListener('click', e => { const b = e.target.closest('[data-sample]'); if (b) loadCanvas(SAMPLES[b.dataset.sample](), b.dataset.sample); });
+
+  /* Görsel yükleme */
+  $('pickBg').addEventListener('click', () => $('bgFile').click());
+  $('bgFile').addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; });
+  $('clearBg').addEventListener('click', clearImage);
+  const drop = $('drop'), stage = $('previewCard');
+  [drop, stage].forEach(t => {
+    t.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+    t.addEventListener('dragleave', () => drop.classList.remove('over'));
+    t.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) { loadFile(e.dataTransfer.files[0]); selectTab('image'); } });
+  });
+
+  $('undo').addEventListener('click', undo); $('redo').addEventListener('click', redo);
+  $('saveBtn').addEventListener('click', saveProject);
+  $('saveName').addEventListener('keydown', e => { if (e.key === 'Enter') saveProject(); });
+  $('verifyBtn').addEventListener('click', () => verify(false));
+  $('themeBtn').addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+  /* Dışa aktarma menüsü */
+  $('exportBtn').addEventListener('click', e => { e.stopPropagation(); const o = !$('exportMenu').classList.contains('open'); $('exportMenu').classList.toggle('open', o); $('scrim').classList.toggle('open', o); $('exportBtn').setAttribute('aria-expanded', String(o)); });
+  $('scrim').addEventListener('click', closeMenu);
+  document.addEventListener('click', e => { if (!$('exportWrap').contains(e.target)) closeMenu(); });
+  $('xDownload').addEventListener('click', doDownload); $('xCopy').addEventListener('click', doCopy); $('xShare').addEventListener('click', doShare);
+  if (navigator.canShare) $('xShare').hidden = false;
+
+  /* Sekmeler */
+  $$('.tab').forEach(t => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+  $('tabbar').addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const tabs = $$('.tab'), i = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true'), j = (i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+    selectTab(tabs[j].dataset.tab); tabs[j].focus();
+  });
+
+  /* Klavye */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeMenu();
+    const mod = e.ctrlKey || e.metaKey, tag = (e.target.tagName || '').toLowerCase(), typing = tag === 'textarea' || (tag === 'input' && !['range', 'checkbox', 'color'].includes(e.target.type));
+    if (!mod || document.body.classList.contains('placer-mode')) return;
+    const key = e.key.toLowerCase();
+    if (key === 'z' && !typing) { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+    else if (key === 'y' && !typing) { e.preventDefault(); redo(); }
+    else if (key === 's') { e.preventDefault(); saveProject(); }
+  });
+  window.addEventListener('resize', render);
+}
+function closeMenu(){ $('exportMenu').classList.remove('open'); $('scrim').classList.remove('open'); $('exportBtn').setAttribute('aria-expanded', 'false'); }
+function selectTab(id){
+  $$('.tab').forEach(t => { const on = t.dataset.tab === id; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
+  $$('.panel').forEach(p => { p.hidden = p.id !== 'p-' + id; });
+  ls.set('mikroqr-tab', id);
+  if (id === 'saved') renderProjects();
+}
+
+/* ---------- Kabuk: Stüdyo / Yerleştirici ---------- */
+const frame = $('placerFrame');
+async function styledPng(){
+  const r = currentSvg({ embed: true }); if (!r) return null;
+  return (await svgToCanvas(r.svg, r.W, r.H, 1200)).toDataURL('image/png');
+}
+async function sendStyled(){
+  if (!frame.contentWindow) return;
+  let dataUrl = null; try { dataUrl = await styledPng(); } catch (e) {}
+  frame.contentWindow.postMessage({ type: 'mikroqr:styled-qr', dataUrl, payload: buildPayload(state) }, '*');
+}
+function setView(view){
+  const placer = view === 'placer';
+  document.body.classList.toggle('placer-mode', placer);
+  $('showStudio').setAttribute('aria-pressed', String(!placer));
+  $('showPlacer').setAttribute('aria-pressed', String(placer));
+  document.title = placer ? 'MikroQR – Görsel Yerleştirici' : 'MikroQR – QR Tasarım Stüdyosu';
+  try { history.replaceState(null, '', placer ? '#yerlestirici' : location.pathname + location.search); } catch (e) {}
+  closeMenu();
+  if (placer) {
+    if (!frame.getAttribute('src')) frame.setAttribute('src', frame.dataset.src);
+    else sendStyled();
+  }
+}
+window.addEventListener('message', e => {
+  if (e.source !== frame.contentWindow || !e.data) return;
+  if (e.data.type === 'mikroqr:back-to-studio') setView('studio');
+  else if (e.data.type === 'mikroqr:ready') { sendStyled(); frame.contentWindow.postMessage({ type: 'mikroqr:theme', theme: document.documentElement.getAttribute('data-theme') }, '*'); }
+});
+$('showStudio').addEventListener('click', () => setView('studio'));
+$('showPlacer').addEventListener('click', () => setView('placer'));
+
+/* ---------- Başlangıç ---------- */
+(function init(){
+  try { const a = ls.get('mikroQR:autosave'); if (a) state = normalize(JSON.parse(a)); } catch (e) {}
+  $('themeUse').setAttribute('href', document.documentElement.getAttribute('data-theme') === 'dark' ? '#i-sun' : '#i-moon');
+  loadProjects(); buildTiles(); wire();
+  selectTab(ls.get('mikroqr-tab') && $('p-' + ls.get('mikroqr-tab')) ? ls.get('mikroqr-tab') : 'tpl');
+  makeMatrix(); syncUI(); paint();
+  if (location.hash === '#yerlestirici') setView('placer');
+  if (!canDetect) $('verifyNote').textContent = 'Bu tarayıcı yerleşik QR okuyucu sunmuyor. Tarama testi için telefon kameranı kullan.';
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
 })();
 </script>
-
-</body></html>
+</body>
+</html>

@@ -1,169 +1,223 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MikroQR — Görsel Yerleştirici</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>MikroQR – Görsel Yerleştirici</title>
 <script src="../lib/qrcode.js"></script>
 <script src="../lib/qrcode_UTF8.js"></script>
+<script>
+(function(){var t=null;try{t=localStorage.getItem('mikroqr-theme')}catch(e){}
+if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <style>
-:root {
-  --bg: #f3f2ef; --surface: #ffffff; --fg: #1b1d21; --muted: #5d636d; --line: #d9d8d3;
-  --accent: #d9480f; --accent-fg: #ffffff; --stage: #e4e3de; --warn: #a15c00; --ok: #2b7a3d;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+:root{
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,system-ui,sans-serif;
+  color-scheme:light;
+  --bg:#f5f5f7;--surface:#fff;--fill:#f2f2f5;--fill-2:#e6e6eb;--line:rgba(0,0,0,.09);--line-2:rgba(0,0,0,.18);
+  --ink:#1d1d1f;--ink-2:#424245;--muted:#6e6e73;--seg-on:#fff;
+  --accent:#0071e3;--on-accent:#fff;--accent-soft:rgba(0,113,227,.11);
+  --ok:#1a7f37;--warn:#9a5700;--bad:#c5221f;--track:rgba(0,0,0,.13);--stage:#ececf0;
+  --shadow-1:0 1px 2px rgba(0,0,0,.04),0 0 0 1px var(--line);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14161a; --surface: #1c1f25; --fg: #eceae4; --muted: #9aa0aa; --line: #2d3139;
-    --accent: #ff7a3d; --accent-fg: #14161a; --stage: #0e1013; --warn: #f0b34a; --ok: #6fcf86;
-    color-scheme: dark;
-  }
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#000;--surface:#1c1c1e;--fill:#2c2c2e;--fill-2:#3a3a3c;--line:rgba(255,255,255,.10);--line-2:rgba(255,255,255,.22);
+  --ink:#f5f5f7;--ink-2:#d1d1d6;--muted:#98989d;--seg-on:#636366;
+  --accent:#0a84ff;--accent-soft:rgba(10,132,255,.2);--ok:#30d158;--warn:#ffb340;--bad:#ff6961;--track:rgba(255,255,255,.2);--stage:#111113;
+  --shadow-1:0 0 0 1px var(--line);
 }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font); padding: 24px max(16px, env(safe-area-inset-right)) 40px max(16px, env(safe-area-inset-left)); }
-.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 20px; }
-h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; }
-.lead { margin: 4px 0 0; color: var(--muted); max-width: 66ch; }
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
-@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
-.stage-box { background: var(--stage); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; }
-.stage-wrap { display: grid; place-items: center; min-height: 160px; }
-#stage { display: block; max-width: 100%; height: auto; touch-action: none; cursor: crosshair; border-radius: 4px; }
-#stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.hint { margin: 0; color: var(--muted); font-size: 13px; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 14px; }
-fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 12px; min-width: 0; }
-legend { padding: 0; margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
-hr { border: 0; border-top: 1px solid var(--line); margin: 2px 0; width: 100%; }
-.field { display: grid; gap: 5px; min-width: 0; }
-label, .lbl { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
-input[type="text"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; }
-textarea { resize: vertical; min-height: 64px; }
-input[type="range"] { width: 100%; accent-color: var(--accent); }
-.row { display: flex; gap: 12px; flex-wrap: wrap; }
-.row > .field { flex: 1 1 110px; }
-input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
-.head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.val { font-variant-numeric: tabular-nums; font-weight: 500; }
-.check { display: flex; gap: 8px; align-items: center; font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--fg); }
-.check input { accent-color: var(--accent); width: 16px; height: 16px; }
-.btn { font: inherit; font-weight: 600; border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
-.btn:hover { border-color: var(--muted); }
-.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btns { display: flex; gap: 8px; flex-wrap: wrap; }
-.btns .btn { flex: 1 1 120px; }
-.pos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 150px; }
-.pos button { aspect-ratio: 1; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; cursor: pointer; position: relative; }
-.pos button::after { content: ""; position: absolute; width: 8px; height: 8px; background: var(--muted); border-radius: 2px; inset: 0; margin: auto; }
-.pos button:hover { border-color: var(--accent); }
-.pos button:hover::after { background: var(--accent); }
-.note { font-size: 13px; color: var(--muted); margin: 0; }
-.note.warn { color: var(--warn); }
-.note.ok { color: var(--ok); }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+h1,h2,p{margin:0}
+[hidden]{display:none!important}
+.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1500px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right)) 32px max(16px,env(safe-area-inset-left));display:grid;gap:16px}
+.standalone-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.standalone-head h1{font-size:20px;font-weight:600;letter-spacing:-.015em}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+.card{background:var(--surface);border-radius:18px;box-shadow:var(--shadow-1)}
+.stage-card{position:sticky;top:16px;overflow:hidden}
+.stage-box{display:grid;gap:0}
+.stage-wrap{display:grid;place-items:center;padding:clamp(12px,3vw,32px);background:var(--stage);min-height:220px}
+#stage{display:block;max-width:100%;height:auto;touch-action:none;border-radius:6px;box-shadow:0 10px 34px rgba(0,0,0,.16);background:#fff}
+#stage:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.stage-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;background:var(--fill);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.hint{font-size:12px;color:var(--muted);line-height:1.45}
+.panel{padding:6px 18px 18px}
+fieldset{border:0;padding:16px 0;margin:0;min-width:0;border-bottom:1px solid var(--line);display:grid;gap:14px}
+fieldset:last-child{border-bottom:0;padding-bottom:0}
+legend{padding:0;float:left;width:100%;font-size:12px;font-weight:600;margin-bottom:12px;color:var(--ink)}
+legend+*{clear:both}
+.field{display:grid;gap:7px;min-width:0}
+label,.lbl{font-size:12px;font-weight:500;color:var(--muted)}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.val{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:12px;font-weight:500}
+input[type=text],textarea,select{width:100%;background:var(--fill);border:1px solid transparent;border-radius:10px;padding:9px 12px;font:inherit;color:var(--ink);min-height:36px;transition:border-color .15s,box-shadow .15s}
+textarea{resize:vertical;min-height:72px}
+select{appearance:none;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:0;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--p),var(--track) var(--p))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--track)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;margin-top:-9px;box-shadow:0 1px 5px rgba(0,0,0,.32),0 0 0 .5px rgba(0,0,0,.12)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.32)}
+input[type=range]:focus-visible{outline:0}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent-soft),0 1px 5px rgba(0,0,0,.32)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.color{display:flex;align-items:center;gap:8px;background:var(--fill);border-radius:10px;padding:3px 10px 3px 3px;min-height:38px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--ink-2);text-transform:uppercase}
+.color input[type=color]{-webkit-appearance:none;appearance:none;width:32px;height:32px;border:0;padding:0;background:none;border-radius:8px;cursor:pointer;flex:none}
+.color input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.color input[type=color]::-webkit-color-swatch{border:0;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)}
+.color input[type=color]::-moz-color-swatch{border:0;border-radius:8px}
+.sw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
+.switch{position:relative;display:inline-block;width:44px;height:26px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:13px;background:var(--track);transition:background .2s}
+.switch span::after{content:"";position:absolute;left:2px;top:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked+span{background:var(--accent)}
+.switch input:checked+span::after{transform:translateX(18px)}
+.switch input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:0 14px;border-radius:10px;font-weight:500;background:var(--fill);color:var(--ink);transition:background .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--fill-2)}.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}.btns .btn{flex:1 1 120px}
+.btn:disabled{opacity:.4;pointer-events:none}
+.seg{display:flex;background:var(--fill);border-radius:10px;padding:2px;gap:2px}
+.seg button{flex:1;min-height:32px;padding:0 8px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink-2);white-space:nowrap}
+.seg button[aria-checked=true]{background:var(--seg-on);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px var(--line)}
+.seg button:disabled{opacity:.4;pointer-events:none}
+.pos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:132px}
+.pos button{aspect-ratio:1;border-radius:8px;background:var(--fill);position:relative;transition:background .15s}
+.pos button::after{content:"";position:absolute;width:8px;height:8px;border-radius:2px;background:var(--muted);inset:0;margin:auto}
+.pos button:hover{background:var(--accent-soft)}.pos button:hover::after{background:var(--accent)}
+.note{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+.note.warn{color:var(--warn)}.note.ok{color:var(--ok)}
+.pill{display:grid;grid-template-columns:20px 1fr;gap:8px;padding:12px;border-radius:12px;background:var(--accent-soft);font-size:13px;line-height:1.45}
+.pill .i{color:var(--accent);margin-top:1px}
+.pill b{display:block;font-weight:600}
+.pill .pl{display:block;color:var(--ink-2);word-break:break-all;margin-top:2px}
+.pill button{margin-top:8px;color:var(--accent);font-weight:500;padding:0}
+@media (max-width:900px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .wrap{padding-top:0;gap:12px}
+  .stage-card{top:0;z-index:5;border-radius:0 0 18px 18px;margin:0 calc(-1 * max(16px,env(safe-area-inset-left)));box-shadow:0 8px 24px rgba(0,0,0,.1),0 0 0 1px var(--line)}
+  .stage-wrap{padding:10px;min-height:0}
+  #stage{max-height:42dvh;width:auto}
+}
+@media (max-width:900px) and (max-height:560px){.stage-card{position:static}}
+@media (pointer:coarse){
+  .btn{min-height:44px}.seg button{min-height:40px}
+  input[type=text],textarea,select{font-size:16px;min-height:44px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 15.5l-4.2-4.2-8.3 8.2"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v11.5"/><path d="M7.5 10.5l4.5 4.5 4.5-4.5"/><path d="M4.5 20h15"/></symbol>
+<symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16M4 12h16"/></symbol>
+<symbol id="i-qr" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M14 14h2.5v2.5H14zM18.5 14h2M14 20.5h2.5M18.5 18v2.5h2"/></symbol>
+</defs></svg>
+
 <div class="wrap">
-  <header>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      <h1>MikroQR — Görsel Yerleştirici</h1>
-      <button class="btn primary" id="backToStudio" type="button">← QR Stüdyosuna dön</button>
-    </div>
-    <p class="lead">Görseli yükle, QR'ın yerleşeceği yeri sahnede seç. Sürükle, köşesinden boyutlandır, stilini ayarla. Görselin geri kalanı değişmez. Her şey tarayıcında çalışır, hiçbir dosya dışarı gönderilmez.</p>
+  <header class="standalone-head" id="standaloneHead" hidden>
+    <h1>MikroQR – Görsel Yerleştirici</h1>
+    <button class="btn" id="backToStudio" type="button"><svg class="i"><use href="#i-arrow-left"/></svg>QR Stüdyosu</button>
   </header>
 
   <div class="grid">
-    <section class="stage-box" aria-label="Görsel sahnesi">
-      <div class="stage-wrap"><canvas id="stage" tabindex="0" aria-label="QR konumunu seç. Ok tuşlarıyla taşıyabilirsin."></canvas></div>
-      <p class="hint" id="hint"></p>
+    <section class="card stage-card" aria-label="Görsel sahnesi">
+      <div class="stage-box">
+        <div class="stage-wrap"><canvas id="stage" tabindex="0" aria-label="QR konumunu seç. Ok tuşlarıyla taşıyabilirsin."></canvas></div>
+        <div class="stage-foot">
+          <p class="hint" id="hint"></p>
+          <span class="chip" id="info"></span>
+        </div>
+      </div>
     </section>
 
-    <aside class="panel" aria-label="Ayarlar">
+    <aside class="card panel" aria-label="Ayarlar">
       <fieldset>
         <legend>Görsel</legend>
         <div class="btns">
-          <button class="btn" id="pick" type="button">Görsel seç</button>
+          <button class="btn primary" id="pick" type="button"><svg class="i"><use href="#i-upload"/></svg>Görsel seç</button>
           <button class="btn" id="sample" type="button">Örnek görsel</button>
         </div>
         <input type="file" id="file" accept="image/*" hidden>
-        <p class="note">Dosyayı sahneye sürükleyebilir ya da Ctrl+V ile yapıştırabilirsin.</p>
+        <p class="note">Dosyayı sahneye sürükleyebilir ya da Ctrl+V ile yapıştırabilirsin. Görsel cihazından çıkmaz.</p>
       </fieldset>
-      <hr>
+
       <fieldset>
-        <legend>İçerik</legend>
-        <div class="field">
-          <label for="data">QR içeriği</label>
-          <textarea id="data" spellcheck="false">https://ornek.com/menu</textarea>
+        <legend>QR kaynağı</legend>
+        <div class="seg" role="radiogroup" aria-label="QR kaynağı" id="modeSeg">
+          <button type="button" role="radio" data-v="studio" aria-checked="false">Stüdyo tasarımı</button>
+          <button type="button" role="radio" data-v="simple" aria-checked="true">Basit QR</button>
         </div>
-        <div class="field">
-          <label for="ec">Hata düzeltme</label>
-          <select id="ec">
-            <option value="L">L (en sade kod)</option>
-            <option value="M" selected>M (dengeli)</option>
-            <option value="Q">Q</option>
-            <option value="H">H (en dayanıklı)</option>
-          </select>
+        <div class="pill" id="studioPill" hidden>
+          <svg class="i"><use href="#i-qr"/></svg>
+          <div><b>Stüdyodaki tasarım kullanılıyor</b><span class="pl" id="studioPayload"></span><button type="button" id="editInStudio">Stüdyoda düzenle</button></div>
         </div>
+        <p class="note" id="noStudio" hidden>Stüdyodan tasarım gelmedi. QR Stüdyosu'nda içerik girip buraya dön ya da Basit QR'ı kullan.</p>
       </fieldset>
-      <hr>
+
+      <div id="simpleSet">
+        <fieldset>
+          <legend>İçerik</legend>
+          <div class="field"><label for="data">QR içeriği</label><textarea id="data" spellcheck="false">https://ornek.com/menu</textarea></div>
+          <div class="field"><label for="ec">Hata düzeltme</label>
+            <select id="ec"><option value="L">L (en sade kod)</option><option value="M" selected>M (dengeli)</option><option value="Q">Q</option><option value="H">H (en dayanıklı)</option></select></div>
+        </fieldset>
+        <fieldset>
+          <legend>Stil</legend>
+          <div class="row">
+            <div class="field"><label for="dark">Kod rengi</label><div class="color"><input type="color" id="dark" value="#111111"><span id="darkHex"></span></div></div>
+            <div class="field"><label for="light">Zemin rengi</label><div class="color"><input type="color" id="light" value="#ffffff"><span id="lightHex"></span></div></div>
+          </div>
+          <div class="sw-row"><span>Zemini saydam yap</span><label class="switch"><input type="checkbox" id="transparent" aria-label="Zemini saydam yap"><span></span></label></div>
+          <div class="row">
+            <div class="field"><label for="mstyle">Noktalar</label>
+              <select id="mstyle"><option value="square">Kare</option><option value="round">Yuvarlak köşe</option><option value="dot">Nokta</option></select></div>
+            <div class="field"><label for="estyle">Köşe gözleri</label>
+              <select id="estyle"><option value="square">Kare</option><option value="round">Yuvarlak</option></select></div>
+          </div>
+          <div class="field"><div class="head"><label for="quiet">Kenar boşluğu</label><span class="val" id="quietVal"></span></div><input type="range" id="quiet" min="0" max="6" step="1" value="2"></div>
+          <div class="field"><div class="head"><label for="radius">Kutu köşe yuvarlaklığı</label><span class="val" id="radiusVal"></span></div><input type="range" id="radius" min="0" max="30" step="1" value="0"></div>
+        </fieldset>
+      </div>
+
       <fieldset>
         <legend>Konum ve boyut</legend>
-        <div class="field">
-          <div class="head"><label for="size">Boyut</label><span class="val" id="sizeVal"></span></div>
-          <input type="range" id="size" min="5" max="100" step="1" value="28">
-        </div>
-        <div class="field">
-          <span class="lbl">Hızlı konum</span>
+        <div class="field"><div class="head"><label for="size">Boyut</label><span class="val" id="sizeVal"></span></div><input type="range" id="size" min="5" max="100" step="1" value="28"></div>
+        <div class="field"><span class="lbl">Hızlı konum</span>
           <div class="pos" id="pos">
-            <button type="button" data-p="0,0" aria-label="Sol üst"></button>
-            <button type="button" data-p="1,0" aria-label="Üst orta"></button>
-            <button type="button" data-p="2,0" aria-label="Sağ üst"></button>
-            <button type="button" data-p="0,1" aria-label="Sol orta"></button>
-            <button type="button" data-p="1,1" aria-label="Orta"></button>
-            <button type="button" data-p="2,1" aria-label="Sağ orta"></button>
-            <button type="button" data-p="0,2" aria-label="Sol alt"></button>
-            <button type="button" data-p="1,2" aria-label="Alt orta"></button>
-            <button type="button" data-p="2,2" aria-label="Sağ alt"></button>
-          </div>
-        </div>
+            <button type="button" data-p="0,0" aria-label="Sol üst"></button><button type="button" data-p="1,0" aria-label="Üst orta"></button><button type="button" data-p="2,0" aria-label="Sağ üst"></button>
+            <button type="button" data-p="0,1" aria-label="Sol orta"></button><button type="button" data-p="1,1" aria-label="Orta"></button><button type="button" data-p="2,1" aria-label="Sağ orta"></button>
+            <button type="button" data-p="0,2" aria-label="Sol alt"></button><button type="button" data-p="1,2" aria-label="Alt orta"></button><button type="button" data-p="2,2" aria-label="Sağ alt"></button>
+          </div></div>
       </fieldset>
-      <hr>
-      <fieldset>
-        <legend>Stil</legend>
-        <div class="row">
-          <div class="field"><label for="dark">Kod rengi</label><input type="color" id="dark" value="#111111"></div>
-          <div class="field"><label for="light">Zemin rengi</label><input type="color" id="light" value="#ffffff"></div>
-        </div>
-        <label class="check"><input type="checkbox" id="transparent"> Zemini saydam yap</label>
-        <div class="row">
-          <div class="field"><label for="mstyle">Noktalar</label>
-            <select id="mstyle"><option value="square">Kare</option><option value="round">Yuvarlak köşe</option><option value="dot">Nokta</option></select></div>
-          <div class="field"><label for="estyle">Köşe gözleri</label>
-            <select id="estyle"><option value="square">Kare</option><option value="round">Yuvarlak</option></select></div>
-        </div>
-        <div class="field">
-          <div class="head"><label for="quiet">Kenar boşluğu</label><span class="val" id="quietVal"></span></div>
-          <input type="range" id="quiet" min="0" max="6" step="1" value="2">
-        </div>
-        <div class="field">
-          <div class="head"><label for="radius">Kutu köşe yuvarlaklığı</label><span class="val" id="radiusVal"></span></div>
-          <input type="range" id="radius" min="0" max="30" step="1" value="0">
-        </div>
-      </fieldset>
-      <hr>
+
       <fieldset>
         <legend>Kaydet</legend>
         <div class="row">
-          <div class="field"><label for="fmt">Biçim</label>
-            <select id="fmt"><option value="png">PNG</option><option value="jpeg">JPEG</option><option value="webp">WebP</option></select></div>
-          <div class="field"><label for="scale">Çözünürlük</label>
-            <select id="scale"><option value="1">Orijinal</option><option value="0.5">Yarısı</option><option value="2">2 kat</option></select></div>
+          <div class="field"><label for="fmt">Biçim</label><select id="fmt"><option value="png">PNG</option><option value="jpeg">JPEG</option><option value="webp">WebP</option></select></div>
+          <div class="field"><label for="scale">Çözünürlük</label><select id="scale"><option value="1">Orijinal</option><option value="0.5">Yarısı</option><option value="2">2 kat</option></select></div>
         </div>
         <p class="note" id="status" role="status" aria-live="polite"></p>
         <div class="btns">
-          <button class="btn" id="test" type="button">Taranabilirlik testi</button>
-          <button class="btn primary" id="save" type="button">Kaydet</button>
+          <button class="btn" id="test" type="button"><svg class="i"><use href="#i-scan"/></svg>Tarama testi</button>
+          <button class="btn primary" id="save" type="button"><svg class="i"><use href="#i-download"/></svg>Kaydet</button>
         </div>
       </fieldset>
     </aside>
@@ -175,32 +229,46 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
   var stage = $("stage"), ctx = stage.getContext("2d");
-  var src = null, natW = 0, natH = 0, PW = 0, PH = 0, baseName = "gorsel", isSample = true;
-  var st = { fx: 0.62, fy: 0.52, fs: 0.28 }; // görsel genişliğine oranlı
-  var qr = null, styledQR = null;
+  var src = null, natW = 0, natH = 0, PW = 0, PH = 0, baseName = "gorsel";
+  var st = { fx: 0.62, fy: 0.52, fs: 0.28 };      // görsel genişliğine oranlı
+  var qr = null, styledQR = null, studioPayload = "", mode = "simple";
+  var embedded = window.parent !== window;
   var KEYS = ["data", "ec", "dark", "light", "mstyle", "estyle", "quiet", "radius", "fmt", "scale"];
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   function setStatus(t, cls) { var el = $("status"); el.textContent = t; el.className = "note" + (cls ? " " + cls : ""); }
 
-  // --- Ayarları hatırla ---
+  /* ---- Ayarlar ---- */
   function saveSettings() {
-    try {
-      var o = {};
-      KEYS.forEach(function (k) { o[k] = $(k).value; });
-      o.transparent = $("transparent").checked;
-      localStorage.setItem("qr-yerlestirici", JSON.stringify(o));
-    } catch (e) {}
+    var o = {};
+    KEYS.forEach(function (k) { o[k] = $(k).value; });
+    o.transparent = $("transparent").checked; o.mode = mode;
+    ls("qr-yerlestirici", JSON.stringify(o));
   }
   function loadSettings() {
     try {
-      var o = JSON.parse(localStorage.getItem("qr-yerlestirici") || "null");
+      var o = JSON.parse(ls("qr-yerlestirici") || "null");
       if (!o) return;
       KEYS.forEach(function (k) { if (o[k] != null) $(k).value = o[k]; });
       $("transparent").checked = !!o.transparent;
+      if (o.mode === "studio" || o.mode === "simple") mode = o.mode;
     } catch (e) {}
   }
 
-  // --- Örnek görsel ---
+  /* ---- Tema ---- */
+  window.addEventListener("message", function (e) {
+    var d = e.data; if (!d || e.source !== window.parent) return;
+    if (d.type === "mikroqr:theme" && (d.theme === "dark" || d.theme === "light")) { document.documentElement.setAttribute("data-theme", d.theme); render(); }
+    else if (d.type === "mikroqr:styled-qr") {
+      studioPayload = d.payload || "";
+      if (!d.dataUrl) { styledQR = null; updateMode(); render(); return; }
+      var image = new Image();
+      image.onload = function () { styledQR = image; if (!window.__modeChosen && mode !== "studio") { mode = "studio"; } updateMode(); render(); };
+      image.src = d.dataUrl;
+    }
+  });
+
+  /* ---- Örnek görsel ---- */
   function makeSample() {
     var c = document.createElement("canvas"); c.width = 1200; c.height = 800;
     var g = c.getContext("2d");
@@ -219,32 +287,33 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
 
   function setSource(s, name, sample) {
     var d = dims(s);
-    src = s; natW = d.w; natH = d.h; isSample = !!sample; baseName = name || "gorsel";
+    src = s; natW = d.w; natH = d.h; baseName = name || "gorsel";
     PW = Math.min(1400, natW); PH = Math.round(PW * natH / natW);
     stage.width = PW; stage.height = PH;
     var maxPct = Math.floor(Math.min(1, natH / natW) * 100);
     $("size").max = String(maxPct);
     st.fs = Math.min(st.fs, maxPct / 100);
     clamp();
-    $("hint").textContent = (sample ? "Bu bir örnek görsel. " : "") +
-      "Bir yere dokun: QR oraya gelir. Sürükleyerek taşı, sağ alt köşedeki kareden boyutlandır. Ok tuşları da çalışır (Shift ile büyük adım).";
+    $("hint").textContent = (sample ? "Örnek görsel. " : "") + "Dokun: QR oraya gelir. Sürükleyerek taşı, köşelerden boyutlandır. Ok tuşları da çalışır.";
     render();
   }
-
   function clamp() {
     var h = natH / natW;
     st.fs = Math.max(0.05, Math.min(st.fs, Math.min(1, h)));
     st.fx = Math.max(0, Math.min(st.fx, 1 - st.fs));
     st.fy = Math.max(0, Math.min(st.fy, h - st.fs));
-    $("size").value = String(Math.round(st.fs * 100));
+    var sz = $("size"); sz.value = String(Math.round(st.fs * 100));
     $("sizeVal").textContent = "%" + Math.round(st.fs * 100);
+    fillRange(sz);
+    $("info").textContent = Math.round(st.fs * natW) + " × " + Math.round(st.fs * natW) + " px";
   }
+  function fillRange(el) { var a = +el.min, b = +el.max; el.style.setProperty("--p", ((el.value - a) / (b - a) * 100) + "%"); }
 
-  // --- QR üretimi ---
+  /* ---- QR üretimi (Basit mod) ---- */
   function buildQR() {
     var text = $("data").value;
     qr = null;
-    if (!text) { setStatus("QR içeriği boş. Bir bağlantı ya da metin yaz.", "warn"); return; }
+    if (!text) { if (mode === "simple") setStatus("QR içeriği boş. Bir bağlantı ya da metin yaz.", "warn"); return; }
     try {
       var m = qrcode(0, $("ec").value);
       m.addData(text, "Byte"); m.make(); qr = m;
@@ -261,14 +330,14 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
   }
   function checkContrast() {
+    if (mode === "studio") { setStatus("", ""); return; }
     var a = lum($("dark").value), b = lum($("light").value);
     var ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-    if ($("transparent").checked) setStatus("Zemin saydam: kodun okunması arkadaki görsele bağlı. Kaydetmeden önce taranabilirlik testini çalıştır.", "warn");
+    if ($("transparent").checked) setStatus("Zemin saydam: okunabilirlik arkadaki görsele bağlı. Kaydetmeden önce tarama testini çalıştır.", "warn");
     else if (a > b) setStatus("Kod rengi zeminden açık. Çoğu okuyucu bunu taramaz.", "warn");
     else if (ratio < 4) setStatus("Renk kontrastı düşük, taranması zorlaşabilir.", "warn");
     else setStatus("", "");
   }
-
   function rr(g, x, y, w, h, r) {
     r = Math.max(0, Math.min(r, w / 2, h / 2));
     g.moveTo(x + r, y); g.lineTo(x + w - r, y); g.arcTo(x + w, y, x + w, y + r, r);
@@ -276,48 +345,37 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     g.lineTo(x + r, y + h); g.arcTo(x, y + h, x, y + h - r, r);
     g.lineTo(x, y + r); g.arcTo(x, y, x + r, y, r); g.closePath();
   }
-
   function inEye(r, c, n) { return (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7); }
+  function useStyled() { return mode === "studio" && styledQR && styledQR.complete && styledQR.naturalWidth; }
 
   function drawQR(g, x, y, size) {
-    if (styledQR && styledQR.complete && styledQR.naturalWidth) {
-      g.drawImage(styledQR, x, y, size, size);
-      return;
-    }
+    if (useStyled()) { g.imageSmoothingQuality = "high"; g.drawImage(styledQR, x, y, size, size); return; }
     if (!qr) return;
     var n = qr.getModuleCount(), q = parseInt($("quiet").value, 10);
     var m = size / (n + q * 2), dark = $("dark").value, light = $("light").value;
     var ms = $("mstyle").value, round = $("estyle").value === "round";
     var boxR = parseInt($("radius").value, 10) / 100 * size;
-    if (!$("transparent").checked) {
-      g.fillStyle = light; g.beginPath(); rr(g, x, y, size, size, boxR); g.fill();
-    }
+    if (!$("transparent").checked) { g.fillStyle = light; g.beginPath(); rr(g, x, y, size, size, boxR); g.fill(); }
     g.fillStyle = dark;
     var ox = x + q * m, oy = y + q * m, r, c;
     for (r = 0; r < n; r++) {
       for (c = 0; c < n; c++) {
         if (!qr.isDark(r, c) || inEye(r, c, n)) continue;
         if (ms === "square") {
-          var x0 = Math.round(ox + c * m), x1 = Math.round(ox + (c + 1) * m);
-          var y0 = Math.round(oy + r * m), y1 = Math.round(oy + (r + 1) * m);
+          var x0 = Math.round(ox + c * m), x1 = Math.round(ox + (c + 1) * m), y0 = Math.round(oy + r * m), y1 = Math.round(oy + (r + 1) * m);
           g.fillRect(x0, y0, x1 - x0, y1 - y0);
-        } else if (ms === "round") {
-          g.beginPath(); rr(g, ox + c * m, oy + r * m, m, m, m * 0.35); g.fill();
-        } else {
-          g.beginPath(); g.arc(ox + (c + 0.5) * m, oy + (r + 0.5) * m, m * 0.46, 0, Math.PI * 2); g.fill();
-        }
+        } else if (ms === "round") { g.beginPath(); rr(g, ox + c * m, oy + r * m, m, m, m * 0.35); g.fill(); }
+        else { g.beginPath(); g.arc(ox + (c + 0.5) * m, oy + (r + 0.5) * m, m * 0.46, 0, Math.PI * 2); g.fill(); }
       }
     }
     [[0, 0], [0, n - 7], [n - 7, 0]].forEach(function (p) {
       var ex = ox + p[1] * m, ey = oy + p[0] * m;
-      g.beginPath();
-      rr(g, ex, ey, 7 * m, 7 * m, round ? 2 * m : 0);
-      rr(g, ex + m, ey + m, 5 * m, 5 * m, round ? 1.2 * m : 0);
-      g.fill("evenodd");
+      g.beginPath(); rr(g, ex, ey, 7 * m, 7 * m, round ? 2 * m : 0); rr(g, ex + m, ey + m, 5 * m, 5 * m, round ? 1.2 * m : 0); g.fill("evenodd");
       g.beginPath(); rr(g, ex + 2 * m, ey + 2 * m, 3 * m, 3 * m, round ? 1.1 * m : 0); g.fill();
     });
   }
 
+  function corners(x, y, s) { return { tl: [x, y], tr: [x + s, y], bl: [x, y + s], br: [x + s, y + s] }; }
   function render() {
     if (!src) return;
     ctx.clearRect(0, 0, PW, PH);
@@ -325,45 +383,55 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     var x = st.fx * PW, y = st.fy * PW, s = st.fs * PW;
     drawQR(ctx, x, y, s);
     var k = PW / (stage.getBoundingClientRect().width || PW);
-    var accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#d9480f";
+    var accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#0071e3";
     ctx.save();
-    ctx.lineWidth = 2 * k; ctx.strokeStyle = accent; ctx.fillStyle = accent;
-    ctx.setLineDash([6 * k, 4 * k]);
-    ctx.strokeRect(x - k, y - k, s + 2 * k, s + 2 * k);
-    ctx.setLineDash([]);
-    var hs = 16 * k; ctx.fillRect(x + s - hs / 2, y + s - hs / 2, hs, hs);
+    ctx.lineWidth = 2 * k; ctx.strokeStyle = accent; ctx.setLineDash([7 * k, 5 * k]);
+    ctx.strokeRect(x, y, s, s); ctx.setLineDash([]);
+    var cs = corners(x, y, s), hr = 7 * k;
+    Object.keys(cs).forEach(function (n) {
+      ctx.beginPath(); ctx.arc(cs[n][0], cs[n][1], hr, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff"; ctx.fill(); ctx.lineWidth = 2.5 * k; ctx.strokeStyle = accent; ctx.stroke();
+    });
     ctx.restore();
   }
 
-  // --- Sürükle / boyutlandır ---
+  /* ---- Sürükle / boyutlandır ---- */
   var drag = null;
-  function pt(e) {
-    var r = stage.getBoundingClientRect(), k = PW / r.width;
-    return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k, k: k };
+  function pt(e) { var r = stage.getBoundingClientRect(), k = PW / r.width; return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k, k: k }; }
+  function hitCorner(p) {
+    var x = st.fx * PW, y = st.fy * PW, s = st.fs * PW, hit = (e_isTouch ? 26 : 16) * p.k, cs = corners(x, y, s), best = null, bd = 1e9;
+    Object.keys(cs).forEach(function (n) { var d = Math.hypot(p.x - cs[n][0], p.y - cs[n][1]); if (d < hit && d < bd) { best = n; bd = d; } });
+    return best;
   }
+  var e_isTouch = false;
   stage.addEventListener("pointerdown", function (e) {
     if (!src) return;
-    var p = pt(e), x = st.fx * PW, y = st.fy * PW, s = st.fs * PW, hit = 20 * p.k;
+    e_isTouch = e.pointerType === "touch";
+    var p = pt(e), x = st.fx * PW, y = st.fy * PW, s = st.fs * PW, c = hitCorner(p);
     stage.setPointerCapture(e.pointerId);
-    if (Math.abs(p.x - (x + s)) < hit && Math.abs(p.y - (y + s)) < hit) {
-      drag = { mode: "resize", px: p.x, py: p.y, fs: st.fs };
-    } else if (p.x >= x && p.x <= x + s && p.y >= y && p.y <= y + s) {
-      drag = { mode: "move", ox: p.x - x, oy: p.y - y };
-    } else {
-      st.fx = (p.x - s / 2) / PW; st.fy = (p.y - s / 2) / PW; clamp();
-      drag = { mode: "move", ox: s / 2, oy: s / 2 }; render();
-    }
+    if (c) drag = { mode: "resize", c: c, ax: c.indexOf("l") > -1 ? x + s : x, ay: c[0] === "t" ? y + s : y };
+    else if (p.x >= x && p.x <= x + s && p.y >= y && p.y <= y + s) drag = { mode: "move", ox: p.x - x, oy: p.y - y };
+    else { st.fx = (p.x - s / 2) / PW; st.fy = (p.y - s / 2) / PW; clamp(); drag = { mode: "move", ox: s / 2, oy: s / 2 }; render(); }
   });
   stage.addEventListener("pointermove", function (e) {
-    if (!drag) return;
     var p = pt(e);
+    if (!drag) {
+      if (!src) return;
+      var c = hitCorner(p), x = st.fx * PW, y = st.fy * PW, s = st.fs * PW;
+      stage.style.cursor = c ? (c === "tl" || c === "br" ? "nwse-resize" : "nesw-resize") : (p.x >= x && p.x <= x + s && p.y >= y && p.y <= y + s ? "move" : "crosshair");
+      return;
+    }
     if (drag.mode === "move") { st.fx = (p.x - drag.ox) / PW; st.fy = (p.y - drag.oy) / PW; }
-    else { st.fs = drag.fs + ((p.x - drag.px) + (p.y - drag.py)) / 2 / PW; }
+    else {
+      var dx = Math.abs(p.x - drag.ax), dy = Math.abs(p.y - drag.ay), ns = (dx + dy) / 2 / PW, h = natH / natW;
+      ns = Math.max(0.05, Math.min(ns, Math.min(1, h)));
+      var left = drag.c.indexOf("l") > -1, top = drag.c[0] === "t";
+      st.fs = ns; st.fx = (left ? drag.ax / PW - ns : drag.ax / PW); st.fy = (top ? drag.ay / PW - ns : drag.ay / PW);
+    }
     clamp(); render();
   });
   function end() { drag = null; }
-  stage.addEventListener("pointerup", end);
-  stage.addEventListener("pointercancel", end);
+  stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
   stage.addEventListener("keydown", function (e) {
     var step = e.shiftKey ? 0.05 : 0.01, used = true;
     if (e.key === "ArrowLeft") st.fx -= step; else if (e.key === "ArrowRight") st.fx += step;
@@ -373,7 +441,6 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
   });
   window.addEventListener("resize", render);
 
-  // --- Hızlı konum ---
   $("pos").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || !src) return;
     var p = b.dataset.p.split(",").map(Number), h = natH / natW, mg = 0.04;
@@ -382,11 +449,12 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     clamp(); render();
   });
 
-  // --- Kontroller ---
+  /* ---- Kontroller ---- */
   $("size").addEventListener("input", function () { st.fs = parseInt($("size").value, 10) / 100; clamp(); render(); });
   function labels() {
-    $("quietVal").textContent = $("quiet").value + " modül";
-    $("radiusVal").textContent = "%" + $("radius").value;
+    $("quietVal").textContent = $("quiet").value + " modül"; $("radiusVal").textContent = "%" + $("radius").value;
+    $("darkHex").textContent = $("dark").value; $("lightHex").textContent = $("light").value;
+    fillRange($("quiet")); fillRange($("radius")); fillRange($("size"));
   }
   ["quiet", "radius", "dark", "light", "mstyle", "estyle", "transparent"].forEach(function (id) {
     $(id).addEventListener("input", function () { labels(); checkContrast(); saveSettings(); render(); });
@@ -395,18 +463,39 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
   $("ec").addEventListener("change", function () { buildQR(); saveSettings(); render(); });
   ["fmt", "scale"].forEach(function (id) { $(id).addEventListener("change", saveSettings); });
 
-  // --- Görsel yükleme ---
+  function updateMode() {
+    var has = !!styledQR;
+    var seg = $("modeSeg");
+    if (mode === "studio" && !has) mode = "simple";
+    Array.prototype.forEach.call(seg.querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-checked", String(b.dataset.v === mode));
+      if (b.dataset.v === "studio") b.disabled = !has;
+    });
+    $("studioPill").hidden = !(mode === "studio" && has);
+    $("studioPayload").textContent = studioPayload.length > 80 ? studioPayload.slice(0, 80) + "…" : studioPayload;
+    $("noStudio").hidden = has || !embedded;
+    $("simpleSet").hidden = mode === "studio";
+    $("editInStudio").hidden = !embedded;
+    checkContrast();
+  }
+  $("modeSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b || b.disabled) return;
+    window.__modeChosen = true; mode = b.dataset.v; saveSettings(); updateMode(); render();
+  });
+  $("editInStudio").addEventListener("click", goBack);
+
+  /* ---- Görsel yükleme ---- */
   function loadFile(f) {
     if (!f || f.type.indexOf("image/") !== 0) { setStatus("Bu dosya bir görsel değil.", "warn"); return; }
     var url = URL.createObjectURL(f), im = new Image();
-    im.onload = function () { setSource(im, f.name.replace(/\.[^.]+$/, "") || "gorsel", false); buildQR(); render(); };
+    im.onload = function () { setSource(im, f.name.replace(/\.[^.]+$/, "") || "gorsel", false); };
     im.onerror = function () { setStatus("Görsel açılamadı. Başka bir dosya dene.", "warn"); };
     im.src = url;
   }
   $("pick").addEventListener("click", function () { $("file").click(); });
   $("file").addEventListener("change", function () { loadFile($("file").files[0]); $("file").value = ""; });
   $("sample").addEventListener("click", function () { setSource(makeSample(), "ornek", true); });
-  var box = document.querySelector(".stage-box");
+  var box = document.querySelector(".stage-card");
   box.addEventListener("dragover", function (e) { e.preventDefault(); });
   box.addEventListener("drop", function (e) { e.preventDefault(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
   document.addEventListener("paste", function (e) {
@@ -414,7 +503,7 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     if (items[0] && items[0].type.indexOf("image/") === 0) loadFile(items[0]);
   });
 
-  // --- Dışa aktarma ---
+  /* ---- Dışa aktarma ---- */
   function exportCanvas() {
     var sc = parseFloat($("scale").value), W = Math.max(1, Math.round(natW * sc)), H = Math.max(1, Math.round(natH * sc));
     var c = document.createElement("canvas"); c.width = W; c.height = H;
@@ -423,9 +512,10 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     drawQR(g, st.fx * W, st.fy * W, st.fs * W);
     return c;
   }
+  function ready() { return useStyled() || qr; }
   $("save").addEventListener("click", function () {
     if (!src) return;
-    if (!qr) { setStatus("Kaydetmeden önce geçerli bir QR içeriği gir.", "warn"); return; }
+    if (!ready()) { setStatus("Kaydetmeden önce geçerli bir QR içeriği gir.", "warn"); return; }
     var fmt = $("fmt").value, mime = "image/" + fmt, ext = fmt === "jpeg" ? "jpg" : fmt;
     exportCanvas().toBlob(function (blob) {
       if (!blob) { setStatus("Görsel oluşturulamadı. Boyutu küçültmeyi dene.", "warn"); return; }
@@ -437,11 +527,9 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     }, mime, 0.92);
   });
   $("test").addEventListener("click", function () {
-    if (!src || !qr) { setStatus("Önce geçerli bir QR içeriği gir.", "warn"); return; }
-    if (!("BarcodeDetector" in window)) {
-      setStatus("Bu tarayıcı yerleşik QR okuyucu sunmuyor. Telefon kameranla ekrandan dene.", "warn"); return;
-    }
-    var text = $("data").value;
+    if (!src || !ready()) { setStatus("Önce geçerli bir QR içeriği gir.", "warn"); return; }
+    if (!("BarcodeDetector" in window)) { setStatus("Bu tarayıcı yerleşik QR okuyucu sunmuyor. Telefon kameranla ekrandan dene.", "warn"); return; }
+    var text = useStyled() ? studioPayload : $("data").value;
     new BarcodeDetector({ formats: ["qr_code"] }).detect(exportCanvas()).then(function (res) {
       if (!res.length) setStatus("Kod okunamadı. Zemini opak yap, kontrastı artır ya da boyutu büyüt.", "warn");
       else if (res[0].rawValue !== text) setStatus("Kod okundu ama içerik farklı çıktı. Stili sadeleştir.", "warn");
@@ -449,26 +537,18 @@ input[type="color"] { width: 100%; height: 38px; padding: 2px; border: 1px solid
     }, function () { setStatus("Test çalışmadı. Telefon kameranla ekrandan dene.", "warn"); });
   });
 
+  function goBack() {
+    if (embedded) window.parent.postMessage({ type: "mikroqr:back-to-studio" }, "*");
+    else window.location.href = "../index.html";
+  }
+  $("backToStudio").addEventListener("click", goBack);
+  if (!embedded) $("standaloneHead").hidden = false;
 
-
-  // Ana stüdyodan gelen tasarlanmış QR görselini aynen kullan.
-  window.addEventListener("message", function (event) {
-    if (event.origin !== window.location.origin || !event.data || event.data.type !== "mikroqr:styled-qr") return;
-    var image = new Image();
-    image.onload = function () { styledQR = image; render(); };
-    image.src = event.data.dataUrl;
-  });
-
-  $("backToStudio").addEventListener("click", function () {
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: "mikroqr:back-to-studio" }, window.location.origin);
-    } else {
-      window.location.href = "../index.html";
-    }
-  });
-  loadSettings(); labels();
+  loadSettings(); labels(); updateMode();
   buildQR();
   setSource(makeSample(), "ornek", true);
+  st.fx = 1 - st.fs - 0.04; st.fy = natH / natW - st.fs - 0.04; clamp(); render();
+  if (embedded) window.parent.postMessage({ type: "mikroqr:ready" }, "*");
 })();
 </script>
 </body>
